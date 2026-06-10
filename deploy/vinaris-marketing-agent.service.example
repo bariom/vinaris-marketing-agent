@@ -7,7 +7,7 @@ Type=simple
 User=ubuntu
 WorkingDirectory=/opt/vinaris-marketing-agent
 Environment=HOST=127.0.0.1
-Environment=PORT=8000
+Environment=PORT=8123
 Environment=WORKERS=2
 ExecStart=/opt/vinaris-marketing-agent/deploy/start_ubuntu.sh
 Restart=always

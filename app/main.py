@@ -4,6 +4,7 @@ import argparse
 from typing import Sequence
 
 from app.config import get_settings
+from app.content_generator import CATEGORIES
 from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
@@ -27,6 +28,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--platform",
         choices=["Facebook", "Instagram", "LinkedIn"],
         help="Genera post solo per una piattaforma specifica.",
+    )
+    generate_parser.add_argument(
+        "--category",
+        choices=sorted(CATEGORIES),
+        help="Genera post solo per una categoria specifica.",
     )
     generate_parser.add_argument(
         "--with-images",
@@ -81,8 +87,13 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def handle_generate(count: int, with_images: bool, platform: str | None) -> int:
-    records = generate_posts(count, with_images=with_images, platform=platform)
+def handle_generate(
+    count: int,
+    with_images: bool,
+    platform: str | None,
+    category: str | None,
+) -> int:
+    records = generate_posts(count, with_images=with_images, platform=platform, category=category)
     for post in records:
         image_note = f" image={post.image_path}" if post.image_path else ""
         print(
@@ -208,7 +219,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         if args.command == "generate":
-            return handle_generate(args.count, args.with_images, args.platform)
+            return handle_generate(args.count, args.with_images, args.platform, args.category)
         if args.command == "list":
             return handle_list(args.status, args.limit)
         if args.command == "show":

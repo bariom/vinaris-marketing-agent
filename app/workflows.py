@@ -34,6 +34,7 @@ def generate_posts(
     count: int,
     with_images: bool = False,
     platform: str | None = None,
+    category: str | None = None,
     settings: Settings | None = None,
 ) -> list[PostRecord]:
     active_settings = settings or get_settings()
@@ -48,7 +49,7 @@ def generate_posts(
     )
 
     records: list[PostRecord] = []
-    for post in generator.generate_posts(count, platform=platform):
+    for post in generator.generate_posts(count, platform=platform, category=category):
         post_id = storage.create_post(post.to_dict())
         if with_images:
             rendered = renderer.render_post_image(

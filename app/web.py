@@ -5,6 +5,7 @@ from pathlib import Path
 from flask import Flask, flash, redirect, render_template, request, send_file, url_for
 
 from app.config import get_settings
+from app.content_generator import CATEGORIES
 from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
@@ -43,6 +44,7 @@ def dashboard():
         active_status=status or "",
         active_platform=platform or "",
         valid_statuses=sorted(VALID_STATUSES),
+        categories=sorted(CATEGORIES),
         platforms=PLATFORMS,
     )
 
@@ -81,7 +83,8 @@ def generate():
         count = max(1, int(request.form.get("count", "5")))
         with_images = request.form.get("with_images") == "on"
         platform = request.form.get("platform") or None
-        records = generate_posts(count, with_images=with_images, platform=platform)
+        category = request.form.get("category") or None
+        records = generate_posts(count, with_images=with_images, platform=platform, category=category)
         flash(f"Creati {len(records)} post.", "success")
     except (ValueError, StorageError, ImageRenderError) as exc:
         flash(str(exc), "error")

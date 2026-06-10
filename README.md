@@ -95,6 +95,18 @@ Generare post solo per Instagram:
 python -m app.main generate --count 3 --platform Instagram
 ```
 
+Generare post solo per una categoria specifica:
+
+```bash
+python -m app.main generate --count 2 --category "gestione cantina"
+```
+
+Generare post per piattaforma e categoria:
+
+```bash
+python -m app.main generate --count 2 --platform Instagram --category "beta tester"
+```
+
 Generare 10 bozze con immagine OpenAI per ciascuna:
 
 ```bash
@@ -220,6 +232,8 @@ Avvio manuale con Gunicorn:
 ```bash
 bash deploy/start_ubuntu.sh
 ```
+
+La porta di default nello startup script e `8123`.
 
 Update dal repository:
 

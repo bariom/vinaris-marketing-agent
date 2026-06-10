@@ -5,7 +5,7 @@ umask 027
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="${VENV_DIR:-$APP_DIR/.venv}"
 HOST="${HOST:-0.0.0.0}"
-PORT="${PORT:-8000}"
+PORT="${PORT:-8123}"
 WORKERS="${WORKERS:-2}"
 
 if [[ ! -f "$APP_DIR/.env" ]]; then
