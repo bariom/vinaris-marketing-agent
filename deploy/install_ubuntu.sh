@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 027
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="${VENV_DIR:-$APP_DIR/.venv}"
@@ -24,10 +25,15 @@ mkdir -p "$APP_DIR/data" "$APP_DIR/generated_images"
 echo "[5/5] Preparing .env"
 if [[ ! -f "$APP_DIR/.env" ]]; then
   cp "$APP_DIR/.env.example" "$APP_DIR/.env"
+  chmod 600 "$APP_DIR/.env"
   echo ".env created from .env.example. Fill in your keys before starting."
 else
+  chmod 600 "$APP_DIR/.env"
   echo ".env already present, left unchanged."
 fi
+
+chmod 755 "$APP_DIR"
+chmod 700 "$APP_DIR/data" "$APP_DIR/generated_images"
 
 echo "Install complete."
 echo "Next: edit $APP_DIR/.env and run deploy/start_ubuntu.sh"

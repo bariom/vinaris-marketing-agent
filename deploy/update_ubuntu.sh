@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 027
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="${VENV_DIR:-$APP_DIR/.venv}"
@@ -19,6 +20,10 @@ echo "[2/4] Updating Python dependencies"
 
 echo "[3/4] Ensuring runtime folders"
 mkdir -p "$APP_DIR/data" "$APP_DIR/generated_images"
+if [[ -f "$APP_DIR/.env" ]]; then
+  chmod 600 "$APP_DIR/.env"
+fi
+chmod 700 "$APP_DIR/data" "$APP_DIR/generated_images"
 
 echo "[4/4] Restarting service if configured"
 if [[ -n "$SERVICE_NAME" ]]; then

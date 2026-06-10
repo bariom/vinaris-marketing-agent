@@ -233,6 +233,29 @@ sudo systemctl start vinaris-marketing-agent
 sudo systemctl status vinaris-marketing-agent
 ```
 
+Protezione di `.env`:
+
+- `.env` non viene versionato grazie a `.gitignore`
+- `deploy/install_ubuntu.sh` forza `chmod 600 .env`
+- le cartelle `data/` e `generated_images/` vengono create con permessi stretti
+- se usi Nginx, nega l'accesso ai dotfile con il template:
+
+```text
+deploy/nginx.vinaris-marketing-agent.conf.example
+```
+
+Controlli consigliati sul server:
+
+```bash
+ls -l .env
+curl -I http://tuo-dominio/.env
+```
+
+L'obiettivo e vedere:
+
+- `.env` leggibile solo dall'utente di servizio
+- risposta `403` o `404` via Nginx su `/.env`
+
 ## Cosa genera
 
 Ogni post contiene:
