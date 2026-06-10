@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="panel grid-two">
+    <form method="post" action="{{ url_for('generate') }}" class="stack">
+      <h2>Genera post</h2>
+      <label>
+        <span>Numero post</span>
+        <input type="number" name="count" value="5" min="1" max="50">
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" name="with_images">
+        <span>Genera anche immagini Gemini</span>
+      </label>
+      <button type="submit">Genera bozze</button>
+    </form>
+
+    <form method="post" action="{{ url_for('render_batch') }}" class="stack">
+      <h2>Render batch</h2>
+      <label>
+        <span>Stato</span>
+        <select name="status">
+          {% for status in valid_statuses %}
+            <option value="{{ status }}" {% if status == 'draft' %}selected{% endif %}>{{ status }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Piattaforma</span>
+        <select name="platform">
+          <option value="">Tutte</option>
+          {% for platform in platforms %}
+            <option value="{{ platform }}">{{ platform }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Limite</span>
+        <input type="number" name="limit" min="1" placeholder="Opzionale">
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" name="only_missing" checked>
+        <span>Solo post senza immagine</span>
+      </label>
+      <button type="submit">Lancia render batch</button>
+    </form>
+  </section>
+
+  <section class="stats-grid">
+    {% for status, count in stats.items() %}
+      <article class="stat-card">
+        <p class="stat-label">{{ status }}</p>
+        <p class="stat-value">{{ count }}</p>
+      </article>
+    {% endfor %}
+  </section>
+
+  <section class="panel stack">
+    <form method="get" action="{{ url_for('dashboard') }}" class="toolbar">
+      <label>
+        <span>Stato</span>
+        <select name="status">
+          <option value="">Tutti</option>
+          {% for status in valid_statuses %}
+            <option value="{{ status }}" {% if active_status == status %}selected{% endif %}>{{ status }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Piattaforma</span>
+        <select name="platform">
+          <option value="">Tutte</option>
+          {% for platform in platforms %}
+            <option value="{{ platform }}" {% if active_platform == platform %}selected{% endif %}>{{ platform }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button type="submit">Applica filtri</button>
+    </form>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Stato</th>
+            <th>Piattaforma</th>
+            <th>Categoria</th>
+            <th>Formato</th>
+            <th>Titolo</th>
+            <th>Immagine</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in posts %}
+            <tr>
+              <td>{{ post.id }}</td>
+              <td><span class="badge badge-{{ post.status }}">{{ post.status }}</span></td>
+              <td>{{ post.platform }}</td>
+              <td>{{ post.category }}</td>
+              <td>{{ post.platform_aspect_ratio }}</td>
+              <td><a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title_internal }}</a></td>
+              <td>{{ "sì" if post.image_path else "no" }}</td>
+              <td>
+                <div class="action-row">
+                  <form method="post" action="{{ url_for('approve', post_id=post.id) }}">
+                    <input type="hidden" name="source" value="dashboard">
+                    <button type="submit" class="secondary">Approva</button>
+                  </form>
+                  <form method="post" action="{{ url_for('reject', post_id=post.id) }}">
+                    <input type="hidden" name="source" value="dashboard">
+                    <button type="submit" class="ghost">Rifiuta</button>
+                  </form>
+                  <form method="post" action="{{ url_for('publish', post_id=post.id) }}">
+                    <input type="hidden" name="source" value="dashboard">
+                    <button type="submit" class="secondary">Pubblica</button>
+                  </form>
+                  <form method="post" action="{{ url_for('render_image', post_id=post.id) }}">
+                    <input type="hidden" name="source" value="dashboard">
+                    <button type="submit" class="ghost">Render</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8">Nessun post trovato.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

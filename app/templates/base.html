@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vinaris Marketing Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Vinaris</p>
+        <h1>Marketing Agent</h1>
+        <p class="subhead">Private cellar intelligence</p>
+      </div>
+      <a class="header-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <section class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </section>
+      {% endif %}
+    {% endwith %}
+
+    <main class="page-shell">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="detail-grid">
+    <article class="panel stack">
+      <div class="detail-head">
+        <div>
+          <p class="eyebrow">Post #{{ post.id }}</p>
+          <h2>{{ post.title_internal }}</h2>
+        </div>
+        <span class="badge badge-{{ post.status }}">{{ post.status }}</span>
+      </div>
+
+      <dl class="meta-grid">
+        <div><dt>Piattaforma</dt><dd>{{ post.platform }}</dd></div>
+        <div><dt>Categoria</dt><dd>{{ post.category }}</dd></div>
+        <div><dt>Formato</dt><dd>{{ post.platform_aspect_ratio }}</dd></div>
+        <div><dt>Creazione</dt><dd>{{ post.created_at }}</dd></div>
+        <div><dt>Pianificata</dt><dd>{{ post.scheduled_at or "-" }}</dd></div>
+        <div><dt>Pubblicata</dt><dd>{{ post.published_at or "-" }}</dd></div>
+      </dl>
+
+      <div class="copy-block">
+        <h3>Testo breve</h3>
+        <p>{{ post.text_short }}</p>
+      </div>
+      <div class="copy-block">
+        <h3>Testo medio</h3>
+        <p>{{ post.text_medium }}</p>
+      </div>
+      <div class="copy-block">
+        <h3>CTA</h3>
+        <p>{{ post.cta }}</p>
+      </div>
+      <div class="copy-block">
+        <h3>Hashtag</h3>
+        <p>{{ post.hashtags }}</p>
+      </div>
+      <div class="copy-block">
+        <h3>Prompt immagine</h3>
+        <p class="mono">{{ post.image_prompt }}</p>
+      </div>
+
+      <div class="action-row">
+        <form method="post" action="{{ url_for('approve', post_id=post.id) }}">
+          <input type="hidden" name="source" value="detail">
+          <button type="submit" class="secondary">Approva</button>
+        </form>
+        <form method="post" action="{{ url_for('reject', post_id=post.id) }}">
+          <input type="hidden" name="source" value="detail">
+          <button type="submit" class="ghost">Rifiuta</button>
+        </form>
+        <form method="post" action="{{ url_for('publish', post_id=post.id) }}">
+          <input type="hidden" name="source" value="detail">
+          <button type="submit" class="secondary">Pubblica</button>
+        </form>
+        <form method="post" action="{{ url_for('render_image', post_id=post.id) }}">
+          <input type="hidden" name="source" value="detail">
+          <button type="submit" class="ghost">Genera immagine</button>
+        </form>
+      </div>
+    </article>
+
+    <aside class="panel stack">
+      <h3>Anteprima immagine</h3>
+      {% if image_url %}
+        <img src="{{ image_url }}" alt="Immagine post {{ post.id }}" class="preview-image">
+        <p class="mono">{{ post.image_path }}</p>
+      {% else %}
+        <p>Nessuna immagine generata per questo post.</p>
+      {% endif %}
+    </aside>
+  </section>
+{% endblock %}
