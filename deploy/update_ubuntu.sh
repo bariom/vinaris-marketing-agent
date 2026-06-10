@@ -19,11 +19,11 @@ echo "[2/4] Updating Python dependencies"
 "$VENV_DIR/bin/pip" install -r "$APP_DIR/requirements.txt"
 
 echo "[3/4] Ensuring runtime folders"
-mkdir -p "$APP_DIR/data" "$APP_DIR/generated_images"
+mkdir -p "$APP_DIR/data" "$APP_DIR/generated_images" "$APP_DIR/exports"
 if [[ -f "$APP_DIR/.env" ]]; then
   chmod 600 "$APP_DIR/.env"
 fi
-chmod 700 "$APP_DIR/data" "$APP_DIR/generated_images"
+chmod 700 "$APP_DIR/data" "$APP_DIR/generated_images" "$APP_DIR/exports"
 
 echo "[4/4] Restarting service if configured"
 if [[ -n "$SERVICE_NAME" ]]; then

@@ -31,6 +31,7 @@ class Settings:
     openai_image_format: str
     database_path: Path
     generated_images_dir: Path
+    exports_dir: Path
     web_secret_key: str
     beta_monthly_price: str
     beta_yearly_price: str
@@ -58,6 +59,7 @@ def get_settings() -> Settings:
         openai_image_format=os.getenv("OPENAI_IMAGE_FORMAT", "png"),
         database_path=database_path,
         generated_images_dir=BASE_DIR / os.getenv("VINARIS_GENERATED_IMAGES_DIR", "generated_images"),
+        exports_dir=BASE_DIR / os.getenv("VINARIS_EXPORTS_DIR", "exports"),
         web_secret_key=os.getenv("VINARIS_WEB_SECRET", "vinaris-marketing-agent-dev"),
         beta_monthly_price="CHF 6/mese",
         beta_yearly_price="CHF 60/anno",

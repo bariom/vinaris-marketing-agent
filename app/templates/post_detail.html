@@ -58,6 +58,10 @@
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="ghost">Genera immagine</button>
         </form>
+        <form method="post" action="{{ url_for('export', post_id=post.id) }}">
+          <input type="hidden" name="source" value="detail">
+          <button type="submit" class="ghost">Export pack</button>
+        </form>
       </div>
     </article>
 

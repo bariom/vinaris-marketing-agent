@@ -9,6 +9,7 @@ from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
     approve_post,
+    export_post,
     generate_posts,
     publish_post,
     reject_post,
@@ -79,7 +80,8 @@ def generate():
     try:
         count = max(1, int(request.form.get("count", "5")))
         with_images = request.form.get("with_images") == "on"
-        records = generate_posts(count, with_images=with_images)
+        platform = request.form.get("platform") or None
+        records = generate_posts(count, with_images=with_images, platform=platform)
         flash(f"Creati {len(records)} post.", "success")
     except (ValueError, StorageError, ImageRenderError) as exc:
         flash(str(exc), "error")
@@ -112,6 +114,16 @@ def render_image(post_id: int):
         post = render_post_image(post_id)
         flash(f"Immagine generata per il post {post.id}.", "success")
     except (StorageError, ImageRenderError) as exc:
+        flash(str(exc), "error")
+    return redirect(_redirect_target(post_id))
+
+
+@app.post("/posts/<int:post_id>/export")
+def export(post_id: int):
+    try:
+        result = export_post(post_id)
+        flash(f"Export creato in {result.export_dir}.", "success")
+    except (StorageError, ImageRenderError, ValueError, OSError) as exc:
         flash(str(exc), "error")
     return redirect(_redirect_target(post_id))
 

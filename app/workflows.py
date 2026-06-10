@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from app.config import Settings, get_settings
 from app.content_generator import ContentGenerator
+from app.exporter import ExportResult, export_post_pack
 from app.image_renderer import OpenAIImageRenderer
 from app.publisher_stub import PublishResult, simulate_publish
 from app.storage import PostRecord, PostStorage, StorageError
@@ -29,7 +30,12 @@ def build_storage(settings: Settings | None = None) -> PostStorage:
     return PostStorage(active_settings.database_path)
 
 
-def generate_posts(count: int, with_images: bool = False, settings: Settings | None = None) -> list[PostRecord]:
+def generate_posts(
+    count: int,
+    with_images: bool = False,
+    platform: str | None = None,
+    settings: Settings | None = None,
+) -> list[PostRecord]:
     active_settings = settings or get_settings()
     storage = build_storage(active_settings)
     generator = ContentGenerator(active_settings.openai_api_key)
@@ -42,7 +48,7 @@ def generate_posts(count: int, with_images: bool = False, settings: Settings | N
     )
 
     records: list[PostRecord] = []
-    for post in generator.generate_posts(count):
+    for post in generator.generate_posts(count, platform=platform):
         post_id = storage.create_post(post.to_dict())
         if with_images:
             rendered = renderer.render_post_image(
@@ -157,6 +163,13 @@ def render_batch_images(
             items.append(RenderBatchItemResult(post.id, post.platform, False, str(exc)))
 
     return RenderBatchResult(generated_count=generated_count, failed_count=failed_count, items=items)
+
+
+def export_post(post_id: int, settings: Settings | None = None) -> ExportResult:
+    active_settings = settings or get_settings()
+    storage = build_storage(active_settings)
+    post = _require_post(storage, post_id)
+    return export_post_pack(post, active_settings.exports_dir)
 
 
 def _require_post(storage: PostStorage, post_id: int) -> PostRecord:

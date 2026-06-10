@@ -189,21 +189,23 @@ class ContentGenerator:
         self.openai_api_key = openai_api_key
         self.brand = brand
 
-    def generate_posts(self, count: int) -> list[GeneratedPost]:
+    def generate_posts(self, count: int, platform: str | None = None) -> list[GeneratedPost]:
         if count < 1:
             raise ValueError("count deve essere maggiore di zero.")
+        if platform and platform not in PLATFORMS:
+            raise ValueError(f"Piattaforma non valida: {platform}")
 
-        ai_posts = self._generate_with_openai(count)
+        ai_posts = self._generate_with_openai(count, platform=platform)
         if ai_posts:
             return ai_posts
-        return [self._build_mock_post(index) for index in range(count)]
+        return [self._build_mock_post(index, platform=platform) for index in range(count)]
 
-    def _generate_with_openai(self, count: int) -> list[GeneratedPost]:
+    def _generate_with_openai(self, count: int, platform: str | None = None) -> list[GeneratedPost]:
         if not self.openai_api_key or OpenAI is None:
             return []
 
         client = OpenAI(api_key=self.openai_api_key)
-        prompt = self._build_openai_prompt(count)
+        prompt = self._build_openai_prompt(count, platform=platform)
 
         try:
             response = client.responses.create(
@@ -253,9 +255,9 @@ class ContentGenerator:
             )
         return posts
 
-    def _build_mock_post(self, index: int) -> GeneratedPost:
+    def _build_mock_post(self, index: int, platform: str | None = None) -> GeneratedPost:
         category = CATEGORIES[index % len(CATEGORIES)]
-        platform = PLATFORMS[index % len(PLATFORMS)]
+        platform = platform or PLATFORMS[index % len(PLATFORMS)]
         template = random.choice(MOCK_ANGLES[category])
         created_at = datetime.now().isoformat(timespec="seconds")
         scheduled_at = suggest_scheduled_date(index).isoformat(timespec="seconds")
@@ -288,7 +290,12 @@ class ContentGenerator:
             scheduled_at=scheduled_at,
         )
 
-    def _build_openai_prompt(self, count: int) -> str:
+    def _build_openai_prompt(self, count: int, platform: str | None = None) -> str:
+        platform_rule = (
+            f"- usa solo la piattaforma: {platform}"
+            if platform
+            else "- piattaforme possibili: Facebook, Instagram, LinkedIn"
+        )
         return f"""
 Genera {count} post social in JSON puro come array.
 
@@ -296,7 +303,7 @@ Contesto brand:
 {brand_context(self.brand)}
 
 Vincoli:
-- piattaforme: Facebook, Instagram, LinkedIn
+{platform_rule}
 - categorie possibili: {", ".join(CATEGORIES)}
 - tono premium, competente, sobrio
 - lingua italiana

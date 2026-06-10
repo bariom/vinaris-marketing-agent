@@ -4,5 +4,7 @@ __pycache__/
 *.pyc
 data/*.sqlite
 generated_images/*
+exports/*
 !generated_images/.gitkeep
 !data/.gitkeep
+!exports/.gitkeep

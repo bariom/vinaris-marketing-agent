@@ -20,7 +20,7 @@ echo "[3/5] Installing dependencies"
 "$VENV_DIR/bin/pip" install -r "$APP_DIR/requirements.txt"
 
 echo "[4/5] Preparing runtime folders"
-mkdir -p "$APP_DIR/data" "$APP_DIR/generated_images"
+mkdir -p "$APP_DIR/data" "$APP_DIR/generated_images" "$APP_DIR/exports"
 
 echo "[5/5] Preparing .env"
 if [[ ! -f "$APP_DIR/.env" ]]; then
@@ -33,7 +33,7 @@ else
 fi
 
 chmod 755 "$APP_DIR"
-chmod 700 "$APP_DIR/data" "$APP_DIR/generated_images"
+chmod 700 "$APP_DIR/data" "$APP_DIR/generated_images" "$APP_DIR/exports"
 
 echo "Install complete."
 echo "Next: edit $APP_DIR/.env and run deploy/start_ubuntu.sh"

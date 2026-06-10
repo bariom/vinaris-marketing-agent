@@ -33,28 +33,10 @@ La pubblicazione reale non e ancora integrata: `publisher_stub.py` simula il pas
 
 ```text
 app/
-  __init__.py
-  brand_profile.py
-  config.py
-  content_generator.py
-  image_prompt_generator.py
-  image_renderer.py
-  main.py
-  platform_profiles.py
-  publisher_stub.py
-  social_calendar.py
-  static/
-  storage.py
-  templates/
-  web.py
-  workflows.py
 data/
-  posts.sqlite
-generated_images/
-.env.example
 deploy/
-requirements.txt
-README.md
+exports/
+generated_images/
 ```
 
 ## Requisiti
@@ -93,6 +75,7 @@ Variabili supportate:
 - `OPENAI_IMAGE_FORMAT`: formato immagini, default `png`
 - `VINARIS_DB_PATH`: path del database SQLite, default `data/posts.sqlite`
 - `VINARIS_GENERATED_IMAGES_DIR`: cartella output immagini, default `generated_images`
+- `VINARIS_EXPORTS_DIR`: cartella export manuali, default `exports`
 - `VINARIS_WEB_SECRET`: secret key Flask per la dashboard
 - `VINARIS_APP_ENV`: ambiente applicativo
 
@@ -104,6 +87,12 @@ Generare 10 bozze:
 
 ```bash
 python -m app.main generate --count 10
+```
+
+Generare post solo per Instagram:
+
+```bash
+python -m app.main generate --count 3 --platform Instagram
 ```
 
 Generare 10 bozze con immagine OpenAI per ciascuna:
@@ -142,16 +131,16 @@ Generare o rigenerare l'immagine di un post:
 python -m app.main render-image --id 1
 ```
 
+Esportare un pack manuale per pubblicazione esterna:
+
+```bash
+python -m app.main export --id 1
+```
+
 Generare immagini in batch per tutte le bozze Instagram senza immagine:
 
 ```bash
 python -m app.main render-batch --status draft --platform Instagram --only-missing
-```
-
-Generare immagini in batch con limite:
-
-```bash
-python -m app.main render-batch --status draft --limit 5 --only-missing
 ```
 
 Simulare la pubblicazione:
@@ -189,6 +178,27 @@ Funzioni disponibili nella dashboard:
 - pubblicazione simulata
 - generazione immagine singola
 - render batch immagini
+- export pack per pubblicazione manuale
+
+## Export Manuale
+
+Il comando `export` crea una cartella dedicata per post, ad esempio:
+
+```text
+exports/post-8-instagram/
+```
+
+Contenuto:
+
+- `caption.txt`
+- `post.json`
+- immagine generata, se disponibile
+
+Questo e il formato pensato per:
+
+- copia/incolla rapido della caption
+- upload manuale su Instagram
+- archiviazione interna del contenuto approvato
 
 ## Deploy Ubuntu
 
@@ -223,94 +233,23 @@ Se vuoi usare `systemd`, parti dal template:
 deploy/vinaris-marketing-agent.service.example
 ```
 
-Esempio rapido:
-
-```bash
-sudo cp deploy/vinaris-marketing-agent.service.example /etc/systemd/system/vinaris-marketing-agent.service
-sudo systemctl daemon-reload
-sudo systemctl enable vinaris-marketing-agent
-sudo systemctl start vinaris-marketing-agent
-sudo systemctl status vinaris-marketing-agent
-```
-
 Protezione di `.env`:
 
 - `.env` non viene versionato grazie a `.gitignore`
 - `deploy/install_ubuntu.sh` forza `chmod 600 .env`
-- le cartelle `data/` e `generated_images/` vengono create con permessi stretti
+- le cartelle `data/`, `generated_images/` ed `exports/` vengono create con permessi stretti
 - se usi Nginx, nega l'accesso ai dotfile con il template:
 
 ```text
 deploy/nginx.vinaris-marketing-agent.conf.example
 ```
 
-Controlli consigliati sul server:
-
-```bash
-ls -l .env
-curl -I http://tuo-dominio/.env
-```
-
-L'obiettivo e vedere:
-
-- `.env` leggibile solo dall'utente di servizio
-- risposta `403` o `404` via Nginx su `/.env`
-
-## Cosa genera
-
-Ogni post contiene:
-
-- piattaforma
-- formato consigliato per piattaforma
-- titolo interno
-- testo breve
-- testo medio
-- CTA
-- hashtag
-- prompt immagine
-- path immagine generata, se disponibile
-- stato
-- data creazione
-- data pianificata
-
-## Formati per canale
-
-Il progetto salva anche un formato visuale consigliato per canale:
-
-- Instagram: `4:5` con size target `1024x1280`
-- Facebook: `1.91:1` con size target `1536x800`
-- LinkedIn: `1.91:1` con size target `1536x800`
-
-Questo dato viene usato per:
-
-- arricchire il `image_prompt`
-- guidare OpenAI nella generazione
-- rendere piu chiaro il target asset in CLI e dashboard
-
 ## Note tecniche
 
 - Storage basato su SQLite
-- CRUD base in `app/storage.py`
 - CLI costruita con `argparse`
 - Dashboard interna costruita con Flask
 - Codice tipizzato con type hints
 - Fallback automatico a contenuti mock se OpenAI non e configurato o non disponibile
 - Architettura pronta per future integrazioni API social
 - Integrazione immagini via OpenAI Image API
-
-## Roadmap
-
-- Integrazione Meta Graph API
-- Integrazione LinkedIn API
-- Varianti multi-formato immagini per Stories e ads
-- Editing contenuti direttamente da dashboard web
-- Calendario editoriale piu avanzato
-- Metriche performance dei contenuti
-- Versioning dei contenuti e storico revisioni
-
-## Note OpenAI
-
-Secondo la documentazione ufficiale OpenAI, l'API immagini consente di generare immagini da prompt testuali usando modelli GPT Image, incluso `gpt-image-2`, e per richieste singole il percorso consigliato e l'Image API. Le immagini dei modelli GPT Image vengono restituite in base64 e possono essere salvate localmente dal client Python. Fonti:
-
-- https://developers.openai.com/api/docs/guides/image-generation
-- https://developers.openai.com/api/reference/resources/images/methods/generate/

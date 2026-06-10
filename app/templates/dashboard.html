@@ -8,9 +8,18 @@
         <span>Numero post</span>
         <input type="number" name="count" value="5" min="1" max="50">
       </label>
+      <label>
+        <span>Piattaforma</span>
+        <select name="platform">
+          <option value="">Mista</option>
+          {% for platform in platforms %}
+            <option value="{{ platform }}">{{ platform }}</option>
+          {% endfor %}
+        </select>
+      </label>
       <label class="checkbox-row">
         <input type="checkbox" name="with_images">
-        <span>Genera anche immagini Gemini</span>
+        <span>Genera anche immagini OpenAI</span>
       </label>
       <button type="submit">Genera bozze</button>
     </form>
@@ -119,6 +128,10 @@
                   <form method="post" action="{{ url_for('render_image', post_id=post.id) }}">
                     <input type="hidden" name="source" value="dashboard">
                     <button type="submit" class="ghost">Render</button>
+                  </form>
+                  <form method="post" action="{{ url_for('export', post_id=post.id) }}">
+                    <input type="hidden" name="source" value="dashboard">
+                    <button type="submit" class="ghost">Export</button>
                   </form>
                 </div>
               </td>

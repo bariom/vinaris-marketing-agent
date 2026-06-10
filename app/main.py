@@ -8,6 +8,7 @@ from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
     approve_post,
+    export_post,
     generate_posts,
     publish_post,
     reject_post,
@@ -23,9 +24,14 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser = subparsers.add_parser("generate", help="Genera nuovi post draft.")
     generate_parser.add_argument("--count", type=int, default=5, help="Numero di post da generare.")
     generate_parser.add_argument(
+        "--platform",
+        choices=["Facebook", "Instagram", "LinkedIn"],
+        help="Genera post solo per una piattaforma specifica.",
+    )
+    generate_parser.add_argument(
         "--with-images",
         action="store_true",
-        help="Genera anche un'immagine locale per ogni post via Gemini.",
+        help="Genera anche un'immagine locale per ogni post via OpenAI.",
     )
 
     list_parser = subparsers.add_parser("list", help="Lista i post salvati.")
@@ -37,6 +43,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     render_parser = subparsers.add_parser("render-image", help="Genera un'immagine locale per un post.")
     render_parser.add_argument("--id", type=int, required=True, help="ID del post.")
+
+    export_parser = subparsers.add_parser("export", help="Esporta un pack manuale per un post.")
+    export_parser.add_argument("--id", type=int, required=True, help="ID del post.")
 
     render_batch_parser = subparsers.add_parser(
         "render-batch",
@@ -72,8 +81,8 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def handle_generate(count: int, with_images: bool) -> int:
-    records = generate_posts(count, with_images=with_images)
+def handle_generate(count: int, with_images: bool, platform: str | None) -> int:
+    records = generate_posts(count, with_images=with_images, platform=platform)
     for post in records:
         image_note = f" image={post.image_path}" if post.image_path else ""
         print(
@@ -157,6 +166,16 @@ def handle_render_image(post_id: int) -> int:
     return 0
 
 
+def handle_export(post_id: int) -> int:
+    result = export_post(post_id)
+    print(f"Export creato in: {result.export_dir}")
+    print(f"Caption: {result.caption_file}")
+    print(f"JSON: {result.json_file}")
+    if result.image_file:
+        print(f"Immagine: {result.image_file}")
+    return 0
+
+
 def handle_render_batch(
     status: str,
     platform: str | None,
@@ -189,13 +208,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         if args.command == "generate":
-            return handle_generate(args.count, args.with_images)
+            return handle_generate(args.count, args.with_images, args.platform)
         if args.command == "list":
             return handle_list(args.status, args.limit)
         if args.command == "show":
             return handle_show(args.id)
         if args.command == "render-image":
             return handle_render_image(args.id)
+        if args.command == "export":
+            return handle_export(args.id)
         if args.command == "render-batch":
             return handle_render_batch(args.status, args.platform, args.limit, args.only_missing)
         if args.command == "approve":
