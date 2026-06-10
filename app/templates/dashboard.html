@@ -142,6 +142,10 @@
                     <input type="hidden" name="source" value="dashboard">
                     <button type="submit" class="ghost">Export</button>
                   </form>
+                  <form method="post" action="{{ url_for('delete', post_id=post.id) }}" onsubmit="return confirm('Eliminare definitivamente questo post?');">
+                    <input type="hidden" name="source" value="dashboard">
+                    <button type="submit" class="ghost">Elimina</button>
+                  </form>
                 </div>
               </td>
             </tr>

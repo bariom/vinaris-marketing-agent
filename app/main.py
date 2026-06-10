@@ -9,6 +9,7 @@ from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
     approve_post,
+    delete_post,
     export_post,
     generate_posts,
     publish_post,
@@ -52,6 +53,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     export_parser = subparsers.add_parser("export", help="Esporta un pack manuale per un post.")
     export_parser.add_argument("--id", type=int, required=True, help="ID del post.")
+
+    delete_parser = subparsers.add_parser("delete", help="Elimina un post e i relativi asset.")
+    delete_parser.add_argument("--id", type=int, required=True, help="ID del post.")
 
     render_batch_parser = subparsers.add_parser(
         "render-batch",
@@ -187,6 +191,12 @@ def handle_export(post_id: int) -> int:
     return 0
 
 
+def handle_delete(post_id: int) -> int:
+    delete_post(post_id)
+    print(f"Post {post_id} eliminato con relativi asset.")
+    return 0
+
+
 def handle_render_batch(
     status: str,
     platform: str | None,
@@ -228,6 +238,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return handle_render_image(args.id)
         if args.command == "export":
             return handle_export(args.id)
+        if args.command == "delete":
+            return handle_delete(args.id)
         if args.command == "render-batch":
             return handle_render_batch(args.status, args.platform, args.limit, args.only_missing)
         if args.command == "approve":

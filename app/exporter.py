@@ -23,7 +23,7 @@ class ExportError(RuntimeError):
 
 def export_post_pack(post: PostRecord, exports_dir: Path) -> ExportResult:
     exports_dir.mkdir(parents=True, exist_ok=True)
-    export_dir = exports_dir / _build_export_folder_name(post)
+    export_dir = export_dir_for_post(post, exports_dir)
     export_dir.mkdir(parents=True, exist_ok=True)
 
     caption_file = export_dir / "caption.txt"
@@ -61,3 +61,13 @@ def _build_caption(post: PostRecord) -> str:
 def _build_export_folder_name(post: PostRecord) -> str:
     safe_platform = post.platform.lower().replace(" ", "-")
     return f"post-{post.id}-{safe_platform}"
+
+
+def export_dir_for_post(post: PostRecord, exports_dir: Path) -> Path:
+    return exports_dir / _build_export_folder_name(post)
+
+
+def delete_export_pack(post: PostRecord, exports_dir: Path) -> None:
+    export_dir = export_dir_for_post(post, exports_dir)
+    if export_dir.exists():
+        shutil.rmtree(export_dir)

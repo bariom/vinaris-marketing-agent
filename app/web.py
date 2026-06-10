@@ -10,6 +10,7 @@ from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
     approve_post,
+    delete_post,
     export_post,
     generate_posts,
     publish_post,
@@ -81,11 +82,28 @@ def serve_image(post_id: int):
 def generate():
     try:
         count = max(1, int(request.form.get("count", "5")))
-        with_images = request.form.get("with_images") == "on"
+        requested_with_images = request.form.get("with_images") == "on"
         platform = request.form.get("platform") or None
         category = request.form.get("category") or None
-        records = generate_posts(count, with_images=with_images, platform=platform, category=category)
-        flash(f"Creati {len(records)} post.", "success")
+        with_images = requested_with_images and count == 1
+
+        records = generate_posts(
+            count,
+            with_images=with_images,
+            platform=platform,
+            category=category,
+        )
+
+        if requested_with_images and count > 1:
+            flash(
+                (
+                    f"Creati {len(records)} post senza immagini inline. "
+                    "Per evitare timeout web, genera le immagini dopo con Render batch."
+                ),
+                "warning",
+            )
+        else:
+            flash(f"Creati {len(records)} post.", "success")
     except (ValueError, StorageError, ImageRenderError) as exc:
         flash(str(exc), "error")
     return redirect(url_for("dashboard"))
@@ -129,6 +147,17 @@ def export(post_id: int):
     except (StorageError, ImageRenderError, ValueError, OSError) as exc:
         flash(str(exc), "error")
     return redirect(_redirect_target(post_id))
+
+
+@app.post("/posts/<int:post_id>/delete")
+def delete(post_id: int):
+    try:
+        delete_post(post_id)
+        flash(f"Post {post_id} eliminato con relativi asset.", "success")
+        return redirect(url_for("dashboard"))
+    except (StorageError, ImageRenderError, ValueError, OSError) as exc:
+        flash(str(exc), "error")
+        return redirect(_redirect_target(post_id))
 
 
 @app.post("/render-batch")

@@ -149,6 +149,12 @@ Esportare un pack manuale per pubblicazione esterna:
 python -m app.main export --id 1
 ```
 
+Eliminare un post e tutti i relativi asset locali:
+
+```bash
+python -m app.main delete --id 1
+```
+
 Generare immagini in batch per tutte le bozze Instagram senza immagine:
 
 ```bash
@@ -191,6 +197,7 @@ Funzioni disponibili nella dashboard:
 - generazione immagine singola
 - render batch immagini
 - export pack per pubblicazione manuale
+- eliminazione completa del post con cleanup asset
 
 ## Export Manuale
 

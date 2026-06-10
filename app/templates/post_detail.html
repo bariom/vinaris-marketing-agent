@@ -62,6 +62,10 @@
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="ghost">Export pack</button>
         </form>
+        <form method="post" action="{{ url_for('delete', post_id=post.id) }}" onsubmit="return confirm('Eliminare definitivamente questo post e i suoi asset?');">
+          <input type="hidden" name="source" value="detail">
+          <button type="submit" class="ghost">Elimina</button>
+        </form>
       </div>
     </article>
 

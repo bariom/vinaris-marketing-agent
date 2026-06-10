@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from dataclasses import dataclass
 
 from app.config import Settings, get_settings
 from app.content_generator import ContentGenerator
-from app.exporter import ExportResult, export_post_pack
+from app.exporter import ExportResult, delete_export_pack, export_post_pack
 from app.image_renderer import OpenAIImageRenderer
 from app.publisher_stub import PublishResult, simulate_publish
 from app.storage import PostRecord, PostStorage, StorageError
@@ -173,8 +175,26 @@ def export_post(post_id: int, settings: Settings | None = None) -> ExportResult:
     return export_post_pack(post, active_settings.exports_dir)
 
 
+def delete_post(post_id: int, settings: Settings | None = None) -> None:
+    active_settings = settings or get_settings()
+    storage = build_storage(active_settings)
+    post = _require_post(storage, post_id)
+
+    _delete_image_if_present(post.image_path)
+    delete_export_pack(post, active_settings.exports_dir)
+    storage.delete_post(post.id)
+
+
 def _require_post(storage: PostStorage, post_id: int) -> PostRecord:
     post = storage.get_post(post_id)
     if post is None:
         raise StorageError(f"Post {post_id} non trovato.")
     return post
+
+
+def _delete_image_if_present(image_path: str | None) -> None:
+    if not image_path:
+        return
+    path = Path(image_path)
+    if path.exists():
+        path.unlink()
