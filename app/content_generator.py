@@ -227,96 +227,6 @@ MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
     ],
 }
 
-PLATFORM_SHORT_SUFFIXES: dict[str, tuple[str, ...]] = {
-    "Facebook": (
-        "Un punto utile per chi vuole piu controllo senza complicarsi la vita.",
-        "Un tema concreto, spiegato con chiarezza e senza giri inutili.",
-        "Un contenuto pensato per chi vuole leggere qualcosa di subito applicabile.",
-    ),
-    "Instagram": (
-        "Un'idea rapida da cogliere al volo, ma con sostanza.",
-        "Un taglio sintetico, visivo e immediato, senza perdere precisione.",
-        "Uno spunto leggero da leggere, ma non superficiale.",
-    ),
-    "LinkedIn": (
-        "Un punto di vista utile per leggere la cantina in modo piu strutturato.",
-        "Un contenuto con taglio piu analitico, ma sempre leggibile.",
-        "Una riflessione pratica su come dare piu contesto alla collezione.",
-    ),
-}
-
-BRAND_MEDIUM_VARIATIONS: dict[str, tuple[str, ...]] = {
-    "alto": (
-        "Vinaris porta questo approccio in un sistema piu ordinato, leggibile e affidabile.",
-        "L'obiettivo di Vinaris e dare piu continuita e struttura alla gestione della cantina.",
-        "Vinaris traduce questa esigenza in una gestione piu disciplinata e coerente.",
-    ),
-    "equilibrato": (
-        "Vinaris aiuta a trasformare queste esigenze in una gestione piu chiara e continua.",
-        "Con Vinaris questo tipo di attenzione diventa piu semplice da mantenere nel tempo.",
-        "Vinaris rende questo approccio piu pratico, ordinato e sostenibile nel quotidiano.",
-    ),
-    "leggero": (
-        "Con Vinaris tutto questo puo diventare piu naturale e meno dispersivo.",
-        "Vinaris aiuta a tenere insieme queste informazioni con piu fluidita e meno attrito.",
-        "Vinaris prova a rendere questo lavoro piu leggero, senza togliere precisione.",
-    ),
-}
-
-CTA_VARIATIONS: dict[str, dict[str, tuple[str, ...]]] = {
-    "discreto": {
-        "sobrio": (
-            "Scopri di piu su Vinaris.",
-            "Approfondisci l'approccio Vinaris.",
-            "Guarda come si inserisce Vinaris in questo contesto.",
-        ),
-        "caldo": (
-            "Scopri se Vinaris puo esserti utile nella gestione quotidiana.",
-            "Dai un'occhiata a come Vinaris accompagna questo tipo di percorso.",
-            "Esplora Vinaris con un approccio semplice e concreto.",
-        ),
-        "coinvolgente": (
-            "Scopri come Vinaris puo rendere tutto questo piu scorrevole.",
-            "Guarda da vicino come Vinaris puo aiutarti a tenere il filo della tua cantina.",
-            "Esplora Vinaris e vedi se il metodo ti assomiglia.",
-        ),
-    },
-    "equilibrato": {
-        "sobrio": (
-            "Richiedi l'accesso beta per vedere Vinaris in azione.",
-            "Valuta l'accesso beta di Vinaris per approfondire questi temi.",
-            "Prova la beta Vinaris e verifica se il metodo fa per te.",
-        ),
-        "caldo": (
-            "Entra nella beta Vinaris e prova un approccio piu ordinato.",
-            "Richiedi l'accesso beta e verifica come cambia la gestione della cantina.",
-            "Prova Vinaris in beta e confrontalo con il tuo flusso attuale.",
-        ),
-        "coinvolgente": (
-            "Entra nella beta Vinaris e prova un modo piu semplice di tenere tutto insieme.",
-            "Richiedi l'accesso beta e metti ordine alla cantina con piu continuita.",
-            "Prova Vinaris in beta e vedi cosa cambia quando hai piu visibilita.",
-        ),
-    },
-    "deciso": {
-        "sobrio": (
-            "Richiedi ora l'accesso beta a Vinaris.",
-            "Attiva la richiesta di accesso beta e valuta Vinaris in prima persona.",
-            "Candidati alla beta Vinaris e verifica il metodo sul tuo caso reale.",
-        ),
-        "caldo": (
-            "Richiedi subito l'accesso beta e prova Vinaris sulla tua cantina.",
-            "Entra ora nella beta Vinaris e testa un approccio piu ordinato.",
-            "Attiva la richiesta di accesso e porta Vinaris nel tuo flusso di gestione.",
-        ),
-        "coinvolgente": (
-            "Richiedi subito l'accesso beta e prova Vinaris con la tua cantina.",
-            "Entra ora nella beta Vinaris e semplifica il modo in cui tieni tutto sotto controllo.",
-            "Attiva l'accesso beta e verifica subito quanto cambia avere piu visibilita.",
-        ),
-    },
-}
-
 
 @dataclass(slots=True)
 class GeneratedPost:
@@ -505,8 +415,8 @@ class ContentGenerator:
         scheduled_at = suggest_scheduled_date(index).isoformat(timespec="seconds")
         profile = get_platform_profile(platform_name)
 
-        short = f"{template['short']} {random.choice(PLATFORM_SHORT_SUFFIXES[platform_name])}"
-        medium = f"{template['medium']} {random.choice(BRAND_MEDIUM_VARIATIONS[seriousness_level])}"
+        short = template["short"]
+        medium = template["medium"]
         cta = self._apply_editorial_tone_to_cta(
             template["cta"],
             seriousness_level=seriousness_level,
@@ -593,6 +503,8 @@ Vincoli:
 - non scrivere meta-commenti o frasi interne tipo "il messaggio resta", "Vinaris lo racconta", "con un invito"
 - non spiegare il tono: applicalo direttamente nella copy
 - non aggiungere la stessa coda standard su ogni testo
+- varia in modo netto apertura, ritmo, struttura e CTA tra i post dello stesso batch
+- evita di riusare la stessa CTA, la stessa frase finale o lo stesso schema di due frasi in post consecutivi
 
 Per ogni oggetto JSON usa queste chiavi:
 platform, category, title_internal, text_short, text_medium, cta, hashtags, image_angle
@@ -613,5 +525,28 @@ Regole:
         tone_warmth: str,
         promotional_intensity: str,
     ) -> str:
-        del cta, seriousness_level
-        return random.choice(CTA_VARIATIONS[promotional_intensity][tone_warmth])
+        del seriousness_level, tone_warmth
+        if promotional_intensity == "equilibrato":
+            return cta
+
+        if promotional_intensity == "discreto":
+            replacements = (
+                ("Richiedi", "Scopri"),
+                ("Attiva", "Valuta"),
+                ("Candidati", "Approfondisci"),
+                ("Entra", "Scopri"),
+            )
+        else:
+            replacements = (
+                ("Scopri", "Richiedi ora"),
+                ("Approfondisci", "Richiedi ora"),
+                ("Guarda", "Valuta ora"),
+                ("Esplora", "Richiedi ora"),
+                ("Prova", "Attiva"),
+                ("Richiedi", "Richiedi ora"),
+            )
+
+        for source, target in replacements:
+            if cta.startswith(source):
+                return cta.replace(source, target, 1)
+        return cta
