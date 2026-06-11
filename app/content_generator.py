@@ -39,9 +39,9 @@ MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
             "short": "Sapere cosa hai in cantina non dovrebbe dipendere da fogli sparsi o note improvvisate.",
             "medium": (
                 "Molti appassionati costruiscono una collezione di valore, ma la gestiscono ancora in modo frammentato. "
-                "Vinaris aiuta a centralizzare bottiglie, posizioni, quantità e note essenziali in un unico spazio chiaro."
+                "Vinaris aiuta a centralizzare bottiglie, posizioni, quantita e note essenziali in un unico spazio chiaro."
             ),
-            "cta": "Scopri come organizzare la tua cantina privata con più precisione.",
+            "cta": "Scopri come organizzare la tua cantina privata con piu precisione.",
             "hashtags": "#Vinaris #CantinaPrivata #WineCollection #GestioneCantina",
             "angle": "collector reviewing an elegant private cellar inventory on smartphone",
         },
@@ -49,10 +49,10 @@ MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
             "title": "Ogni bottiglia ha un posto, ogni informazione anche",
             "short": "Una cantina ben gestita semplifica scelte, acquisti e aperture.",
             "medium": (
-                "La differenza tra accumulare bottiglie e gestire una cantina privata sta nella qualità delle informazioni. "
+                "La differenza tra accumulare bottiglie e gestire una cantina privata sta nella qualita delle informazioni. "
                 "Con Vinaris puoi tenere sotto controllo dove si trova ogni vino e consultarlo in pochi secondi."
             ),
-            "cta": "Richiedi l’accesso beta e prova un approccio più ordinato.",
+            "cta": "Richiedi l'accesso beta e prova un approccio piu ordinato.",
             "hashtags": "#PrivateCellar #VinarisApp #WineLovers #Cantina",
             "angle": "refined cellar shelves with discrete app interface in foreground",
         },
@@ -60,71 +60,126 @@ MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
     "errori comuni dei collezionisti": [
         {
             "title": "Tre errori silenziosi che indeboliscono una collezione",
-            "short": "Il problema spesso non è comprare troppo, ma perdere visibilità su ciò che si possiede.",
+            "short": "Il problema spesso non e comprare troppo, ma perdere visibilita su cio che si possiede.",
             "medium": (
                 "Duplicare acquisti, dimenticare finestre di beva e non tracciare il valore della cantina sono errori frequenti. "
-                "Vinaris nasce per ridurre questi attriti con una gestione più lucida e continua."
+                "Vinaris nasce per ridurre questi attriti con una gestione piu lucida e continua."
             ),
             "cta": "Vuoi evitare errori ricorrenti? Entra nella beta di Vinaris.",
             "hashtags": "#WineCollector #Vinaris #CollezioneVini #WineTech",
             "angle": "premium visual comparing disorganized notes and clean digital cellar overview",
-        }
+        },
+        {
+            "title": "Una collezione ordinata non dipende solo dalla memoria",
+            "short": "Quando le bottiglie aumentano, gli errori iniziano spesso da dettagli non tracciati.",
+            "medium": (
+                "Una cantina privata perde valore operativo quando acquisti, posizioni e tempi di beva restano dispersi. "
+                "Mettere ordine presto evita decisioni deboli e doppioni inutili."
+            ),
+            "cta": "Scopri come Vinaris aiuta a tenere insieme questi passaggi.",
+            "hashtags": "#WineCollector #CantinaPrivata #Vinaris #WineManagement",
+            "angle": "private cellar records contrasted with a clean, premium digital inventory flow",
+        },
     ],
     "finestre di beva": [
         {
-            "title": "Aprire troppo presto è un costo invisibile",
-            "short": "La finestra di beva è una scelta strategica, non un dettaglio secondario.",
+            "title": "Aprire troppo presto e un costo invisibile",
+            "short": "La finestra di beva e una scelta strategica, non un dettaglio secondario.",
             "medium": (
                 "Una bottiglia aperta nel momento sbagliato perde parte del suo potenziale. "
                 "Monitorare le finestre di beva significa valorizzare meglio ogni acquisto e ogni occasione."
             ),
-            "cta": "Scopri come Vinaris può aiutarti a decidere quando stappare.",
+            "cta": "Scopri come Vinaris puo aiutarti a decidere quando stappare.",
             "hashtags": "#WineDrinkingWindow #Vinaris #FineWine #CantinaIntelligente",
             "angle": "sommelier style scene with mature bottle and subtle timing cues on app",
-        }
+        },
+        {
+            "title": "Sapere quando stappare cambia il valore dell'esperienza",
+            "short": "Non tutte le bottiglie sono pronte quando arriva l'occasione.",
+            "medium": (
+                "Tenere d'occhio le finestre di beva aiuta a non sprecare bottiglie promettenti e a scegliere meglio cosa aprire. "
+                "E un vantaggio pratico, non solo teorico."
+            ),
+            "cta": "Approfondisci come leggere meglio i tempi della tua cantina.",
+            "hashtags": "#FineWine #DrinkingWindow #Vinaris #WineCollection",
+            "angle": "mature bottle selection in a refined cellar with subtle timing and readiness cues",
+        },
     ],
     "valore della cantina": [
         {
             "title": "Conosci davvero il valore della tua cantina?",
-            "short": "Una collezione privata non è solo passione: è anche patrimonio.",
+            "short": "Una collezione privata non e solo passione: e anche patrimonio.",
             "medium": (
-                "Quando la cantina cresce, avere una visione chiara del suo valore diventa utile per acquisti, priorità e consapevolezza. "
-                "Vinaris supporta una lettura più strutturata del patrimonio enologico personale."
+                "Quando la cantina cresce, avere una visione chiara del suo valore diventa utile per acquisti, priorita e consapevolezza. "
+                "Vinaris supporta una lettura piu strutturata del patrimonio enologico personale."
             ),
-            "cta": "Prova Vinaris e dai più contesto al valore della tua collezione.",
+            "cta": "Prova Vinaris e dai piu contesto al valore della tua collezione.",
             "hashtags": "#WineCellarValue #Vinaris #WineCollection #PatrimonioEnologico",
             "angle": "luxury cellar with analytical but elegant digital valuation concept",
-        }
+        },
+        {
+            "title": "Una cantina importante merita numeri leggibili",
+            "short": "Capire il valore della collezione aiuta a fare scelte piu lucide nel tempo.",
+            "medium": (
+                "Quando acquisti e bottiglie maturano, una vista chiara del valore complessivo smette di essere un extra. "
+                "Diventa uno strumento utile per priorita, confronto e gestione."
+            ),
+            "cta": "Guarda come Vinaris puo dare piu contesto a questa lettura.",
+            "hashtags": "#WineValue #PrivateCellar #Vinaris #FineWine",
+            "angle": "premium cellar valuation overview with discreet analytical interface",
+        },
     ],
     "wishlist": [
         {
             "title": "Le grandi bottiglie iniziano spesso da una wishlist ben fatta",
-            "short": "Desiderare un vino è facile. Ricordarsi perché lo si vuole comprare, meno.",
+            "short": "Desiderare un vino e facile. Ricordarsi perche lo si vuole comprare, meno.",
             "medium": (
-                "Una wishlist utile non è una lista casuale, ma uno strumento per confrontare annate, produttori e priorità. "
-                "Vinaris aiuta a mantenere questa visione con ordine e continuità."
+                "Una wishlist utile non e una lista casuale, ma uno strumento per confrontare annate, produttori e priorita. "
+                "Vinaris aiuta a mantenere questa visione con ordine e continuita."
             ),
-            "cta": "Organizza la tua wishlist da collezionista con l’accesso beta.",
+            "cta": "Organizza la tua wishlist da collezionista con l'accesso beta.",
             "hashtags": "#WineWishlist #Vinaris #WineCollector #PrivateCellar",
             "angle": "elegant collector building a wine wishlist on mobile near tasting table",
-        }
+        },
+        {
+            "title": "Una wishlist seria evita acquisti confusi",
+            "short": "Tenere traccia dei desideri giusti aiuta a comprare con piu criterio.",
+            "medium": (
+                "Tra produttori, annate e opportunita, una wishlist ben tenuta riduce dispersione e ripensamenti. "
+                "Diventa una guida concreta per i prossimi acquisti."
+            ),
+            "cta": "Esplora un modo piu ordinato di costruire la tua wishlist.",
+            "hashtags": "#WishlistVini #Vinaris #WineCollector #CantinaPrivata",
+            "angle": "carefully curated wine wishlist workflow in a refined private cellar setting",
+        },
     ],
     "consegne": [
         {
-            "title": "Anche la consegna fa parte dell’esperienza di cantina",
+            "title": "Anche la consegna fa parte dell'esperienza di cantina",
             "short": "Sapere cosa arriva, quando arriva e dove collocarlo riduce attrito e disordine.",
             "medium": (
                 "Ogni nuova consegna merita una registrazione pulita. "
-                "Una gestione precisa in ingresso aiuta a mantenere affidabile l’intera fotografia della cantina."
+                "Una gestione precisa in ingresso aiuta a mantenere affidabile l'intera fotografia della cantina."
             ),
             "cta": "Scopri come Vinaris semplifica il passaggio dalla consegna alla scaffalatura.",
             "hashtags": "#WineDelivery #Vinaris #CantinaPrivata #WineManagement",
             "angle": "premium home delivery of fine wine entering an organized private cellar",
-        }
+        },
+        {
+            "title": "La cantina si complica spesso nel momento dell'arrivo",
+            "short": "Se l'ingresso delle bottiglie e confuso, il resto si trascina dietro lo stesso disordine.",
+            "medium": (
+                "Registrare bene le consegne significa sapere subito cosa e entrato, dove andra e come tenerlo tracciato. "
+                "E una disciplina piccola che migliora tutta la gestione."
+            ),
+            "cta": "Approfondisci come rendere piu lineare questo passaggio.",
+            "hashtags": "#WineLogistics #Vinaris #PrivateCellar #Cantina",
+            "angle": "refined wine delivery intake process moving into a well-organized private cellar",
+        },
     ],
     "beta tester": [
         {
-            "title": "La beta Vinaris è pensata per chi prende sul serio la propria cantina",
+            "title": "La beta Vinaris e pensata per chi prende sul serio la propria cantina",
             "short": "Accesso anticipato, feedback diretto e 2 mesi gratuiti escluso AI Pack.",
             "medium": (
                 "Stiamo aprendo la beta di Vinaris a un gruppo selezionato di appassionati e collezionisti privati. "
@@ -133,21 +188,133 @@ MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
             "cta": "Candidati come beta tester e prova Vinaris in anteprima.",
             "hashtags": "#VinarisBeta #BetaTester #WineApp #PrivateCellarIntelligence",
             "angle": "exclusive beta invitation for a premium wine-tech product",
-        }
+        },
+        {
+            "title": "La beta Vinaris e per chi vuole un metodo, non solo un'app",
+            "short": "Accesso anticipato e spazio per incidere davvero sul prodotto.",
+            "medium": (
+                "La fase beta e pensata per raccogliere feedback utili da chi vive la cantina con attenzione. "
+                "L'obiettivo non e testare rumore, ma abitudini reali di gestione."
+            ),
+            "cta": "Richiedi l'accesso beta se vuoi provare Vinaris da vicino.",
+            "hashtags": "#BetaVinaris #WineApp #PrivateCellar #BetaTester",
+            "angle": "premium beta access invitation for a refined wine-tech platform",
+        },
     ],
     "funzioni Vinaris": [
         {
-            "title": "Vinaris non è una semplice lista bottiglie",
-            "short": "È uno spazio pensato per dare contesto operativo alla tua cantina privata.",
+            "title": "Vinaris non e una semplice lista bottiglie",
+            "short": "E uno spazio pensato per dare contesto operativo alla tua cantina privata.",
             "medium": (
-                "Gestione inventario, wishlist, controllo delle finestre di beva e maggiore visibilità sul valore della collezione: "
+                "Gestione inventario, wishlist, controllo delle finestre di beva e maggiore visibilita sul valore della collezione: "
                 "Vinaris mette ordine dove spesso esistono strumenti separati."
             ),
-            "cta": "Esplora le funzioni Vinaris e richiedi l’accesso beta.",
+            "cta": "Esplora le funzioni Vinaris e richiedi l'accesso beta.",
             "hashtags": "#VinarisFeatures #WineTech #CantinaPrivata #PrivateCellar",
             "angle": "clean premium product showcase of wine cellar app features",
-        }
+        },
+        {
+            "title": "Una cantina privata ha bisogno di contesto, non solo elenco",
+            "short": "Sapere cosa possiedi e utile. Capire come usarlo meglio lo e ancora di piu.",
+            "medium": (
+                "Quando inventario, wishlist e tempi di beva restano scollegati, la gestione perde forza. "
+                "Unire questi elementi aiuta a leggere meglio ogni decisione."
+            ),
+            "cta": "Guarda piu da vicino cosa puo fare Vinaris.",
+            "hashtags": "#WineTech #Vinaris #CellarManagement #PrivateCellar",
+            "angle": "premium product interface showing connected cellar management capabilities",
+        },
     ],
+}
+
+PLATFORM_SHORT_SUFFIXES: dict[str, tuple[str, ...]] = {
+    "Facebook": (
+        "Un punto utile per chi vuole piu controllo senza complicarsi la vita.",
+        "Un tema concreto, spiegato con chiarezza e senza giri inutili.",
+        "Un contenuto pensato per chi vuole leggere qualcosa di subito applicabile.",
+    ),
+    "Instagram": (
+        "Un'idea rapida da cogliere al volo, ma con sostanza.",
+        "Un taglio sintetico, visivo e immediato, senza perdere precisione.",
+        "Uno spunto leggero da leggere, ma non superficiale.",
+    ),
+    "LinkedIn": (
+        "Un punto di vista utile per leggere la cantina in modo piu strutturato.",
+        "Un contenuto con taglio piu analitico, ma sempre leggibile.",
+        "Una riflessione pratica su come dare piu contesto alla collezione.",
+    ),
+}
+
+BRAND_MEDIUM_VARIATIONS: dict[str, tuple[str, ...]] = {
+    "alto": (
+        "Vinaris porta questo approccio in un sistema piu ordinato, leggibile e affidabile.",
+        "L'obiettivo di Vinaris e dare piu continuita e struttura alla gestione della cantina.",
+        "Vinaris traduce questa esigenza in una gestione piu disciplinata e coerente.",
+    ),
+    "equilibrato": (
+        "Vinaris aiuta a trasformare queste esigenze in una gestione piu chiara e continua.",
+        "Con Vinaris questo tipo di attenzione diventa piu semplice da mantenere nel tempo.",
+        "Vinaris rende questo approccio piu pratico, ordinato e sostenibile nel quotidiano.",
+    ),
+    "leggero": (
+        "Con Vinaris tutto questo puo diventare piu naturale e meno dispersivo.",
+        "Vinaris aiuta a tenere insieme queste informazioni con piu fluidita e meno attrito.",
+        "Vinaris prova a rendere questo lavoro piu leggero, senza togliere precisione.",
+    ),
+}
+
+CTA_VARIATIONS: dict[str, dict[str, tuple[str, ...]]] = {
+    "discreto": {
+        "sobrio": (
+            "Scopri di piu su Vinaris.",
+            "Approfondisci l'approccio Vinaris.",
+            "Guarda come si inserisce Vinaris in questo contesto.",
+        ),
+        "caldo": (
+            "Scopri se Vinaris puo esserti utile nella gestione quotidiana.",
+            "Dai un'occhiata a come Vinaris accompagna questo tipo di percorso.",
+            "Esplora Vinaris con un approccio semplice e concreto.",
+        ),
+        "coinvolgente": (
+            "Scopri come Vinaris puo rendere tutto questo piu scorrevole.",
+            "Guarda da vicino come Vinaris puo aiutarti a tenere il filo della tua cantina.",
+            "Esplora Vinaris e vedi se il metodo ti assomiglia.",
+        ),
+    },
+    "equilibrato": {
+        "sobrio": (
+            "Richiedi l'accesso beta per vedere Vinaris in azione.",
+            "Valuta l'accesso beta di Vinaris per approfondire questi temi.",
+            "Prova la beta Vinaris e verifica se il metodo fa per te.",
+        ),
+        "caldo": (
+            "Entra nella beta Vinaris e prova un approccio piu ordinato.",
+            "Richiedi l'accesso beta e verifica come cambia la gestione della cantina.",
+            "Prova Vinaris in beta e confrontalo con il tuo flusso attuale.",
+        ),
+        "coinvolgente": (
+            "Entra nella beta Vinaris e prova un modo piu semplice di tenere tutto insieme.",
+            "Richiedi l'accesso beta e metti ordine alla cantina con piu continuita.",
+            "Prova Vinaris in beta e vedi cosa cambia quando hai piu visibilita.",
+        ),
+    },
+    "deciso": {
+        "sobrio": (
+            "Richiedi ora l'accesso beta a Vinaris.",
+            "Attiva la richiesta di accesso beta e valuta Vinaris in prima persona.",
+            "Candidati alla beta Vinaris e verifica il metodo sul tuo caso reale.",
+        ),
+        "caldo": (
+            "Richiedi subito l'accesso beta e prova Vinaris sulla tua cantina.",
+            "Entra ora nella beta Vinaris e testa un approccio piu ordinato.",
+            "Attiva la richiesta di accesso e porta Vinaris nel tuo flusso di gestione.",
+        ),
+        "coinvolgente": (
+            "Richiedi subito l'accesso beta e prova Vinaris con la tua cantina.",
+            "Entra ora nella beta Vinaris e semplifica il modo in cui tieni tutto sotto controllo.",
+            "Attiva l'accesso beta e verifica subito quanto cambia avere piu visibilita.",
+        ),
+    },
 }
 
 
@@ -280,24 +447,24 @@ class ContentGenerator:
         posts: list[GeneratedPost] = []
         for index, item in enumerate(data[:count]):
             try:
-                platform = str(item["platform"])
-                category = str(item["category"])
+                platform_name = str(item["platform"])
+                category_name = str(item["category"])
                 title = str(item["title_internal"])
                 short = str(item["text_short"])
                 medium = str(item["text_medium"])
                 cta = str(item["cta"])
                 hashtags = str(item["hashtags"])
-                angle = str(item.get("image_angle", category))
+                angle = str(item.get("image_angle", category_name))
             except (KeyError, TypeError, ValueError):
                 continue
 
             created_at = datetime.now().isoformat(timespec="seconds")
             scheduled_at = suggest_scheduled_date(index).isoformat(timespec="seconds")
-            profile = get_platform_profile(platform)
+            profile = get_platform_profile(platform_name)
             posts.append(
                 GeneratedPost(
-                    platform=platform,
-                    category=category,
+                    platform=platform_name,
+                    category=category_name,
                     platform_aspect_ratio=profile.recommended_aspect_ratio,
                     seriousness_level=seriousness_level,
                     tone_warmth=tone_warmth,
@@ -308,8 +475,8 @@ class ContentGenerator:
                     cta=cta,
                     hashtags=hashtags,
                     image_prompt=generate_image_prompt(
-                        platform,
-                        category,
+                        platform_name,
+                        category_name,
                         angle,
                         seriousness_level=seriousness_level,
                         tone_warmth=tone_warmth,
@@ -331,39 +498,15 @@ class ContentGenerator:
         tone_warmth: str = "sobrio",
         promotional_intensity: str = "discreto",
     ) -> GeneratedPost:
-        category = category or CATEGORIES[index % len(CATEGORIES)]
-        platform = platform or PLATFORMS[index % len(PLATFORMS)]
-        template = random.choice(MOCK_ANGLES[category])
+        category_name = category or CATEGORIES[index % len(CATEGORIES)]
+        platform_name = platform or PLATFORMS[index % len(PLATFORMS)]
+        template = random.choice(MOCK_ANGLES[category_name])
         created_at = datetime.now().isoformat(timespec="seconds")
         scheduled_at = suggest_scheduled_date(index).isoformat(timespec="seconds")
-        profile = get_platform_profile(platform)
+        profile = get_platform_profile(platform_name)
 
-        platform_suffix = {
-            "Facebook": "con taglio informativo e accessibile",
-            "Instagram": "con taglio visivo e sintetico",
-            "LinkedIn": "con taglio più strategico e professionale",
-        }[platform]
-
-        short = f"{template['short']} {self.brand.name} lo racconta {platform_suffix}."
-        medium = (
-            f"{template['medium']} {self.brand.name} porta questo approccio nel digitale "
-            f"per offrire private cellar intelligence a collezionisti esigenti."
-        )
-        title = self._apply_editorial_tone_to_title(template["title"], seriousness_level)
-        short = self._apply_editorial_tone_to_copy(
-            short,
-            seriousness_level=seriousness_level,
-            tone_warmth=tone_warmth,
-            promotional_intensity=promotional_intensity,
-            short_form=True,
-        )
-        medium = self._apply_editorial_tone_to_copy(
-            medium,
-            seriousness_level=seriousness_level,
-            tone_warmth=tone_warmth,
-            promotional_intensity=promotional_intensity,
-            short_form=False,
-        )
+        short = f"{template['short']} {random.choice(PLATFORM_SHORT_SUFFIXES[platform_name])}"
+        medium = f"{template['medium']} {random.choice(BRAND_MEDIUM_VARIATIONS[seriousness_level])}"
         cta = self._apply_editorial_tone_to_cta(
             template["cta"],
             seriousness_level=seriousness_level,
@@ -372,20 +515,20 @@ class ContentGenerator:
         )
 
         return GeneratedPost(
-            platform=platform,
-            category=category,
+            platform=platform_name,
+            category=category_name,
             platform_aspect_ratio=profile.recommended_aspect_ratio,
             seriousness_level=seriousness_level,
             tone_warmth=tone_warmth,
             promotional_intensity=promotional_intensity,
-            title_internal=title,
+            title_internal=template["title"],
             text_short=short,
             text_medium=medium,
             cta=cta,
             hashtags=template["hashtags"],
             image_prompt=generate_image_prompt(
-                platform,
-                category,
+                platform_name,
+                category_name,
                 template["angle"],
                 seriousness_level=seriousness_level,
                 tone_warmth=tone_warmth,
@@ -446,6 +589,10 @@ Vincoli:
 - lingua italiana
 - includi un riferimento credibile alla beta tester offer: {self.brand.beta_offer}
 - non usare tono aggressivo
+- evita formule ripetitive tra un post e l'altro
+- non scrivere meta-commenti o frasi interne tipo "il messaggio resta", "Vinaris lo racconta", "con un invito"
+- non spiegare il tono: applicalo direttamente nella copy
+- non aggiungere la stessa coda standard su ogni testo
 
 Per ogni oggetto JSON usa queste chiavi:
 platform, category, title_internal, text_short, text_medium, cta, hashtags, image_angle
@@ -459,43 +606,6 @@ Regole:
 """.strip()
 
     @staticmethod
-    def _apply_editorial_tone_to_title(title: str, seriousness_level: str) -> str:
-        if seriousness_level == "leggero":
-            return f"{title} Senza appesantire il piacere di collezionare."
-        if seriousness_level == "alto":
-            return title
-        return f"{title} Con il giusto equilibrio."
-
-    @staticmethod
-    def _apply_editorial_tone_to_copy(
-        text: str,
-        *,
-        seriousness_level: str,
-        tone_warmth: str,
-        promotional_intensity: str,
-        short_form: bool,
-    ) -> str:
-        seriousness_addition = {
-            "alto": " Il tono resta misurato, lucido e orientato al valore della cantina.",
-            "equilibrato": " Il messaggio resta chiaro, credibile e facile da leggere.",
-            "leggero": " Il messaggio resta curato ma con un passo piu leggero e naturale.",
-        }[seriousness_level]
-        warmth_addition = {
-            "sobrio": " Nessun eccesso, solo contesto utile e ben calibrato.",
-            "caldo": " Con una voce piu vicina a chi vive davvero la cantina ogni giorno.",
-            "coinvolgente": " Con un invito piu vivo a immaginare una gestione della cantina piu semplice.",
-        }[tone_warmth]
-        promotional_addition = {
-            "discreto": " L'invito finale rimane misurato.",
-            "equilibrato": " L'invito finale e presente ma non invadente.",
-            "deciso": " L'invito finale e piu esplicito e orientato all'azione.",
-        }[promotional_intensity]
-        additions = seriousness_addition + warmth_addition
-        if not short_form:
-            additions += promotional_addition
-        return f"{text}{additions}"
-
-    @staticmethod
     def _apply_editorial_tone_to_cta(
         cta: str,
         *,
@@ -503,9 +613,5 @@ Regole:
         tone_warmth: str,
         promotional_intensity: str,
     ) -> str:
-        del seriousness_level
-        if promotional_intensity == "deciso":
-            return cta.replace("Scopri", "Richiedi").replace("Prova", "Attiva").replace("Esplora", "Richiedi")
-        if tone_warmth == "coinvolgente":
-            return f"{cta} In modo semplice e diretto."
-        return cta
+        del cta, seriousness_level
+        return random.choice(CTA_VARIATIONS[promotional_intensity][tone_warmth])
