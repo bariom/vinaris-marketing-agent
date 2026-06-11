@@ -18,6 +18,9 @@ class PostRecord:
     platform: str
     category: str
     platform_aspect_ratio: str | None
+    seriousness_level: str | None
+    tone_warmth: str | None
+    promotional_intensity: str | None
     title_internal: str
     text_short: str
     text_medium: str
@@ -50,6 +53,9 @@ class PostStorage:
                     platform TEXT NOT NULL,
                     category TEXT NOT NULL,
                     platform_aspect_ratio TEXT,
+                    seriousness_level TEXT,
+                    tone_warmth TEXT,
+                    promotional_intensity TEXT,
                     title_internal TEXT NOT NULL,
                     text_short TEXT NOT NULL,
                     text_medium TEXT NOT NULL,
@@ -72,6 +78,12 @@ class PostStorage:
                 connection.execute("ALTER TABLE posts ADD COLUMN image_path TEXT")
             if "platform_aspect_ratio" not in columns:
                 connection.execute("ALTER TABLE posts ADD COLUMN platform_aspect_ratio TEXT")
+            if "seriousness_level" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN seriousness_level TEXT")
+            if "tone_warmth" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN tone_warmth TEXT")
+            if "promotional_intensity" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN promotional_intensity TEXT")
             connection.commit()
 
     def create_post(self, payload: dict[str, Any]) -> int:
@@ -79,15 +91,18 @@ class PostStorage:
             cursor = connection.execute(
                 """
                 INSERT INTO posts (
-                    platform, category, platform_aspect_ratio, title_internal, text_short, text_medium,
+                    platform, category, platform_aspect_ratio, seriousness_level, tone_warmth, promotional_intensity, title_internal, text_short, text_medium,
                     cta, hashtags, image_prompt, status, created_at, scheduled_at, published_at
                     , image_path
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     payload["platform"],
                     payload["category"],
                     payload.get("platform_aspect_ratio"),
+                    payload.get("seriousness_level"),
+                    payload.get("tone_warmth"),
+                    payload.get("promotional_intensity"),
                     payload["title_internal"],
                     payload["text_short"],
                     payload["text_medium"],
@@ -187,6 +202,9 @@ class PostStorage:
             platform=platform,
             category=row["category"],
             platform_aspect_ratio=aspect_ratio,
+            seriousness_level=row["seriousness_level"],
+            tone_warmth=row["tone_warmth"],
+            promotional_intensity=row["promotional_intensity"],
             title_internal=row["title_internal"],
             text_short=row["text_short"],
             text_medium=row["text_medium"],

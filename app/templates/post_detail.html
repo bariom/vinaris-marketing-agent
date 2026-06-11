@@ -15,6 +15,9 @@
         <div><dt>Piattaforma</dt><dd>{{ post.platform }}</dd></div>
         <div><dt>Categoria</dt><dd>{{ post.category }}</dd></div>
         <div><dt>Formato</dt><dd>{{ post.platform_aspect_ratio }}</dd></div>
+        <div><dt>Serietà</dt><dd>{{ post.seriousness_level or "equilibrato" }}</dd></div>
+        <div><dt>Calore tono</dt><dd>{{ post.tone_warmth or "sobrio" }}</dd></div>
+        <div><dt>Spinta promo</dt><dd>{{ post.promotional_intensity or "discreto" }}</dd></div>
         <div><dt>Creazione</dt><dd>{{ post.created_at }}</dd></div>
         <div><dt>Pianificata</dt><dd>{{ post.scheduled_at or "-" }}</dd></div>
         <div><dt>Pubblicata</dt><dd>{{ post.published_at or "-" }}</dd></div>

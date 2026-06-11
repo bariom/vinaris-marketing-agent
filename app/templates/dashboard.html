@@ -26,6 +26,30 @@
           {% endfor %}
         </select>
       </label>
+      <label>
+        <span>Livello di serietà</span>
+        <select name="seriousness_level">
+          {% for level in seriousness_levels %}
+            <option value="{{ level }}" {% if level == 'equilibrato' %}selected{% endif %}>{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Calore del tono</span>
+        <select name="tone_warmth">
+          {% for level in warmth_levels %}
+            <option value="{{ level }}" {% if level == 'sobrio' %}selected{% endif %}>{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Spinta promozionale</span>
+        <select name="promotional_intensity">
+          {% for level in promotional_levels %}
+            <option value="{{ level }}" {% if level == 'discreto' %}selected{% endif %}>{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
       <label class="checkbox-row">
         <input type="checkbox" name="with_images">
         <span>Genera anche immagini OpenAI</span>
@@ -96,10 +120,18 @@
       <button type="submit">Applica filtri</button>
     </form>
 
+    <form method="post" action="{{ url_for('delete_selected') }}" id="bulk-delete-form" class="toolbar bulk-toolbar" onsubmit="return confirmBulkDelete();">
+      <button type="submit" class="ghost" id="bulk-delete-button" disabled>Elimina selezionati</button>
+      <span class="subhead" id="selection-count">0 selezionati</span>
+    </form>
+
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
+            <th class="select-column">
+              <input type="checkbox" id="select-all-posts" aria-label="Seleziona tutti i post">
+            </th>
             <th>ID</th>
             <th>Stato</th>
             <th>Piattaforma</th>
@@ -113,12 +145,29 @@
         <tbody>
           {% for post in posts %}
             <tr>
+              <td class="select-column">
+                <input
+                  type="checkbox"
+                  name="post_ids"
+                  value="{{ post.id }}"
+                  form="bulk-delete-form"
+                  class="post-selector"
+                  aria-label="Seleziona post {{ post.id }}"
+                >
+              </td>
               <td>{{ post.id }}</td>
               <td><span class="badge badge-{{ post.status }}">{{ post.status }}</span></td>
               <td>{{ post.platform }}</td>
               <td>{{ post.category }}</td>
               <td>{{ post.platform_aspect_ratio }}</td>
-              <td><a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title_internal }}</a></td>
+              <td>
+                <a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title_internal }}</a>
+                <div class="post-meta-inline">
+                  <span>{{ post.seriousness_level or 'equilibrato' }}</span>
+                  <span>{{ post.tone_warmth or 'sobrio' }}</span>
+                  <span>{{ post.promotional_intensity or 'discreto' }}</span>
+                </div>
+              </td>
               <td>{{ "sì" if post.image_path else "no" }}</td>
               <td>
                 <div class="action-row">
@@ -151,11 +200,55 @@
             </tr>
           {% else %}
             <tr>
-              <td colspan="8">Nessun post trovato.</td>
+              <td colspan="9">Nessun post trovato.</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </section>
+
+  <script>
+    const selectAllCheckbox = document.getElementById("select-all-posts");
+    const postSelectors = Array.from(document.querySelectorAll(".post-selector"));
+    const bulkDeleteButton = document.getElementById("bulk-delete-button");
+    const selectionCount = document.getElementById("selection-count");
+
+    function updateBulkSelectionState() {
+      const selectedCount = postSelectors.filter((checkbox) => checkbox.checked).length;
+      if (selectionCount) {
+        selectionCount.textContent = `${selectedCount} selezionati`;
+      }
+      if (bulkDeleteButton) {
+        bulkDeleteButton.disabled = selectedCount === 0;
+      }
+      if (selectAllCheckbox) {
+        selectAllCheckbox.checked = selectedCount > 0 && selectedCount === postSelectors.length;
+        selectAllCheckbox.indeterminate = selectedCount > 0 && selectedCount < postSelectors.length;
+      }
+    }
+
+    function confirmBulkDelete() {
+      const selectedCount = postSelectors.filter((checkbox) => checkbox.checked).length;
+      if (selectedCount === 0) {
+        return false;
+      }
+      return window.confirm(`Eliminare definitivamente ${selectedCount} post selezionati?`);
+    }
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", () => {
+        postSelectors.forEach((checkbox) => {
+          checkbox.checked = selectAllCheckbox.checked;
+        });
+        updateBulkSelectionState();
+      });
+    }
+
+    postSelectors.forEach((checkbox) => {
+      checkbox.addEventListener("change", updateBulkSelectionState);
+    });
+
+    updateBulkSelectionState();
+  </script>
 {% endblock %}

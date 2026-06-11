@@ -5,7 +5,12 @@ from pathlib import Path
 from flask import Flask, flash, redirect, render_template, request, send_file, url_for
 
 from app.config import get_settings
-from app.content_generator import CATEGORIES
+from app.content_generator import (
+    CATEGORIES,
+    PROMOTIONAL_LEVELS,
+    SERIOUSNESS_LEVELS,
+    WARMTH_LEVELS,
+)
 from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
@@ -47,6 +52,9 @@ def dashboard():
         valid_statuses=sorted(VALID_STATUSES),
         categories=sorted(CATEGORIES),
         platforms=PLATFORMS,
+        seriousness_levels=SERIOUSNESS_LEVELS,
+        warmth_levels=WARMTH_LEVELS,
+        promotional_levels=PROMOTIONAL_LEVELS,
     )
 
 
@@ -85,6 +93,9 @@ def generate():
         requested_with_images = request.form.get("with_images") == "on"
         platform = request.form.get("platform") or None
         category = request.form.get("category") or None
+        seriousness_level = request.form.get("seriousness_level") or "equilibrato"
+        tone_warmth = request.form.get("tone_warmth") or "sobrio"
+        promotional_intensity = request.form.get("promotional_intensity") or "discreto"
         with_images = requested_with_images and count == 1
 
         records = generate_posts(
@@ -92,6 +103,9 @@ def generate():
             with_images=with_images,
             platform=platform,
             category=category,
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
         )
 
         if requested_with_images and count > 1:
@@ -158,6 +172,30 @@ def delete(post_id: int):
     except (StorageError, ImageRenderError, ValueError, OSError) as exc:
         flash(str(exc), "error")
         return redirect(_redirect_target(post_id))
+
+
+@app.post("/posts/delete-selected")
+def delete_selected():
+    raw_ids = request.form.getlist("post_ids")
+    if not raw_ids:
+        flash("Seleziona almeno un post da eliminare.", "warning")
+        return redirect(url_for("dashboard"))
+
+    try:
+        post_ids = sorted({int(post_id) for post_id in raw_ids})
+    except ValueError:
+        flash("Selezione non valida.", "error")
+        return redirect(url_for("dashboard"))
+
+    try:
+        deleted_count = 0
+        for post_id in post_ids:
+            delete_post(post_id)
+            deleted_count += 1
+        flash(f"Eliminati {deleted_count} post con relativi asset.", "success")
+    except (StorageError, ImageRenderError, ValueError, OSError) as exc:
+        flash(str(exc), "error")
+    return redirect(url_for("dashboard"))
 
 
 @app.post("/render-batch")

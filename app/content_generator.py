@@ -28,6 +28,9 @@ CATEGORIES = (
     "beta tester",
     "funzioni Vinaris",
 )
+SERIOUSNESS_LEVELS = ("alto", "equilibrato", "leggero")
+WARMTH_LEVELS = ("sobrio", "caldo", "coinvolgente")
+PROMOTIONAL_LEVELS = ("discreto", "equilibrato", "deciso")
 
 MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
     "gestione cantina": [
@@ -153,6 +156,9 @@ class GeneratedPost:
     platform: str
     category: str
     platform_aspect_ratio: str
+    seriousness_level: str
+    tone_warmth: str
+    promotional_intensity: str
     title_internal: str
     text_short: str
     text_medium: str
@@ -170,6 +176,9 @@ class GeneratedPost:
             "platform": self.platform,
             "category": self.category,
             "platform_aspect_ratio": self.platform_aspect_ratio,
+            "seriousness_level": self.seriousness_level,
+            "tone_warmth": self.tone_warmth,
+            "promotional_intensity": self.promotional_intensity,
             "title_internal": self.title_internal,
             "text_short": self.text_short,
             "text_medium": self.text_medium,
@@ -194,6 +203,9 @@ class ContentGenerator:
         count: int,
         platform: str | None = None,
         category: str | None = None,
+        seriousness_level: str = "equilibrato",
+        tone_warmth: str = "sobrio",
+        promotional_intensity: str = "discreto",
     ) -> list[GeneratedPost]:
         if count < 1:
             raise ValueError("count deve essere maggiore di zero.")
@@ -201,23 +213,56 @@ class ContentGenerator:
             raise ValueError(f"Piattaforma non valida: {platform}")
         if category and category not in CATEGORIES:
             raise ValueError(f"Categoria non valida: {category}")
+        if seriousness_level not in SERIOUSNESS_LEVELS:
+            raise ValueError(f"Livello di serieta non valido: {seriousness_level}")
+        if tone_warmth not in WARMTH_LEVELS:
+            raise ValueError(f"Livello di calore non valido: {tone_warmth}")
+        if promotional_intensity not in PROMOTIONAL_LEVELS:
+            raise ValueError(f"Livello promozionale non valido: {promotional_intensity}")
 
-        ai_posts = self._generate_with_openai(count, platform=platform, category=category)
+        ai_posts = self._generate_with_openai(
+            count,
+            platform=platform,
+            category=category,
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+        )
         if ai_posts:
             return ai_posts
-        return [self._build_mock_post(index, platform=platform, category=category) for index in range(count)]
+        return [
+            self._build_mock_post(
+                index,
+                platform=platform,
+                category=category,
+                seriousness_level=seriousness_level,
+                tone_warmth=tone_warmth,
+                promotional_intensity=promotional_intensity,
+            )
+            for index in range(count)
+        ]
 
     def _generate_with_openai(
         self,
         count: int,
         platform: str | None = None,
         category: str | None = None,
+        seriousness_level: str = "equilibrato",
+        tone_warmth: str = "sobrio",
+        promotional_intensity: str = "discreto",
     ) -> list[GeneratedPost]:
         if not self.openai_api_key or OpenAI is None:
             return []
 
         client = OpenAI(api_key=self.openai_api_key)
-        prompt = self._build_openai_prompt(count, platform=platform, category=category)
+        prompt = self._build_openai_prompt(
+            count,
+            platform=platform,
+            category=category,
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+        )
 
         try:
             response = client.responses.create(
@@ -254,12 +299,22 @@ class ContentGenerator:
                     platform=platform,
                     category=category,
                     platform_aspect_ratio=profile.recommended_aspect_ratio,
+                    seriousness_level=seriousness_level,
+                    tone_warmth=tone_warmth,
+                    promotional_intensity=promotional_intensity,
                     title_internal=title,
                     text_short=short,
                     text_medium=medium,
                     cta=cta,
                     hashtags=hashtags,
-                    image_prompt=generate_image_prompt(platform, category, angle),
+                    image_prompt=generate_image_prompt(
+                        platform,
+                        category,
+                        angle,
+                        seriousness_level=seriousness_level,
+                        tone_warmth=tone_warmth,
+                        promotional_intensity=promotional_intensity,
+                    ),
                     status="draft",
                     created_at=created_at,
                     scheduled_at=scheduled_at,
@@ -272,6 +327,9 @@ class ContentGenerator:
         index: int,
         platform: str | None = None,
         category: str | None = None,
+        seriousness_level: str = "equilibrato",
+        tone_warmth: str = "sobrio",
+        promotional_intensity: str = "discreto",
     ) -> GeneratedPost:
         category = category or CATEGORIES[index % len(CATEGORIES)]
         platform = platform or PLATFORMS[index % len(PLATFORMS)]
@@ -291,17 +349,48 @@ class ContentGenerator:
             f"{template['medium']} {self.brand.name} porta questo approccio nel digitale "
             f"per offrire private cellar intelligence a collezionisti esigenti."
         )
+        title = self._apply_editorial_tone_to_title(template["title"], seriousness_level)
+        short = self._apply_editorial_tone_to_copy(
+            short,
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+            short_form=True,
+        )
+        medium = self._apply_editorial_tone_to_copy(
+            medium,
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+            short_form=False,
+        )
+        cta = self._apply_editorial_tone_to_cta(
+            template["cta"],
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+        )
 
         return GeneratedPost(
             platform=platform,
             category=category,
             platform_aspect_ratio=profile.recommended_aspect_ratio,
-            title_internal=template["title"],
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+            title_internal=title,
             text_short=short,
             text_medium=medium,
-            cta=template["cta"],
+            cta=cta,
             hashtags=template["hashtags"],
-            image_prompt=generate_image_prompt(platform, category, template["angle"]),
+            image_prompt=generate_image_prompt(
+                platform,
+                category,
+                template["angle"],
+                seriousness_level=seriousness_level,
+                tone_warmth=tone_warmth,
+                promotional_intensity=promotional_intensity,
+            ),
             status="draft",
             created_at=created_at,
             scheduled_at=scheduled_at,
@@ -312,6 +401,9 @@ class ContentGenerator:
         count: int,
         platform: str | None = None,
         category: str | None = None,
+        seriousness_level: str = "equilibrato",
+        tone_warmth: str = "sobrio",
+        promotional_intensity: str = "discreto",
     ) -> str:
         platform_rule = (
             f"- usa solo la piattaforma: {platform}"
@@ -323,6 +415,21 @@ class ContentGenerator:
             if category
             else f"- categorie possibili: {', '.join(CATEGORIES)}"
         )
+        seriousness_rule = {
+            "alto": "tono molto serio, autorevole, misurato; niente ironia o leggerezza marcata",
+            "equilibrato": "tono premium ma non rigido; credibile, chiaro, con una lieve naturalezza",
+            "leggero": "tono piu leggero e arioso, elegante, con una nota piu colloquiale; niente meme o comicita eccessiva",
+        }[seriousness_level]
+        warmth_rule = {
+            "sobrio": "registro distaccato e composto, poco confidenziale",
+            "caldo": "registro piu umano e vicino, senza perdere eleganza",
+            "coinvolgente": "registro piu energico e invitante, pur restando premium",
+        }[tone_warmth]
+        promotional_rule = {
+            "discreto": "CTA soft, orientata alla scoperta, evita pressione commerciale",
+            "equilibrato": "CTA chiara ma non insistente, con invito esplicito all'azione",
+            "deciso": "CTA piu netta e orientata alla conversione, senza diventare aggressiva",
+        }[promotional_intensity]
         return f"""
 Genera {count} post social in JSON puro come array.
 
@@ -333,6 +440,9 @@ Vincoli:
 {platform_rule}
 {category_rule}
 - tono premium, competente, sobrio
+- serieta richiesta: {seriousness_level} -> {seriousness_rule}
+- calore del tono: {tone_warmth} -> {warmth_rule}
+- intensita promozionale: {promotional_intensity} -> {promotional_rule}
 - lingua italiana
 - includi un riferimento credibile alla beta tester offer: {self.brand.beta_offer}
 - non usare tono aggressivo
@@ -347,3 +457,55 @@ Regole:
 - image_angle descrive il concetto visivo in inglese
 - nessun testo fuori dal JSON
 """.strip()
+
+    @staticmethod
+    def _apply_editorial_tone_to_title(title: str, seriousness_level: str) -> str:
+        if seriousness_level == "leggero":
+            return f"{title} Senza appesantire il piacere di collezionare."
+        if seriousness_level == "alto":
+            return title
+        return f"{title} Con il giusto equilibrio."
+
+    @staticmethod
+    def _apply_editorial_tone_to_copy(
+        text: str,
+        *,
+        seriousness_level: str,
+        tone_warmth: str,
+        promotional_intensity: str,
+        short_form: bool,
+    ) -> str:
+        seriousness_addition = {
+            "alto": " Il tono resta misurato, lucido e orientato al valore della cantina.",
+            "equilibrato": " Il messaggio resta chiaro, credibile e facile da leggere.",
+            "leggero": " Il messaggio resta curato ma con un passo piu leggero e naturale.",
+        }[seriousness_level]
+        warmth_addition = {
+            "sobrio": " Nessun eccesso, solo contesto utile e ben calibrato.",
+            "caldo": " Con una voce piu vicina a chi vive davvero la cantina ogni giorno.",
+            "coinvolgente": " Con un invito piu vivo a immaginare una gestione della cantina piu semplice.",
+        }[tone_warmth]
+        promotional_addition = {
+            "discreto": " L'invito finale rimane misurato.",
+            "equilibrato": " L'invito finale e presente ma non invadente.",
+            "deciso": " L'invito finale e piu esplicito e orientato all'azione.",
+        }[promotional_intensity]
+        additions = seriousness_addition + warmth_addition
+        if not short_form:
+            additions += promotional_addition
+        return f"{text}{additions}"
+
+    @staticmethod
+    def _apply_editorial_tone_to_cta(
+        cta: str,
+        *,
+        seriousness_level: str,
+        tone_warmth: str,
+        promotional_intensity: str,
+    ) -> str:
+        del seriousness_level
+        if promotional_intensity == "deciso":
+            return cta.replace("Scopri", "Richiedi").replace("Prova", "Attiva").replace("Esplora", "Richiedi")
+        if tone_warmth == "coinvolgente":
+            return f"{cta} In modo semplice e diretto."
+        return cta

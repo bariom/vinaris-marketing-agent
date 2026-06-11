@@ -6,6 +6,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
+from app.image_prompt_generator import build_image_tone_guidance
 from app.platform_profiles import get_platform_profile
 
 
@@ -44,6 +45,9 @@ class OpenAIImageRenderer:
         title: str,
         prompt: str,
         aspect_ratio: str | None = None,
+        seriousness_level: str = "equilibrato",
+        tone_warmth: str = "sobrio",
+        promotional_intensity: str = "discreto",
     ) -> RenderedImage:
         if not self.api_key:
             raise ImageRenderError("OPENAI_API_KEY non configurata.")
@@ -52,12 +56,18 @@ class OpenAIImageRenderer:
         profile = get_platform_profile(platform)
         ratio = aspect_ratio or profile.recommended_aspect_ratio
         size = profile.recommended_size
+        tone_guidance = build_image_tone_guidance(
+            seriousness_level=seriousness_level,
+            tone_warmth=tone_warmth,
+            promotional_intensity=promotional_intensity,
+        )
 
         client = OpenAI(api_key=self.api_key)
         full_prompt = (
             f"Create a premium social media image for {platform}.\n"
             f"Internal post title: {title}.\n"
             f"Visual direction: {prompt}\n"
+            f"Editorial tone guidance: {tone_guidance}\n"
             f"Target aspect ratio: {ratio}.\n"
             f"Target size: {size}.\n"
             f"Platform visual goal: {profile.visual_goal}.\n"

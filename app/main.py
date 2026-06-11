@@ -4,7 +4,7 @@ import argparse
 from typing import Sequence
 
 from app.config import get_settings
-from app.content_generator import CATEGORIES
+from app.content_generator import CATEGORIES, PROMOTIONAL_LEVELS, SERIOUSNESS_LEVELS, WARMTH_LEVELS
 from app.image_renderer import ImageRenderError
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
@@ -39,6 +39,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--with-images",
         action="store_true",
         help="Genera anche un'immagine locale per ogni post via OpenAI.",
+    )
+    generate_parser.add_argument(
+        "--seriousness-level",
+        choices=SERIOUSNESS_LEVELS,
+        default="equilibrato",
+        help="Livello di serieta dei post.",
+    )
+    generate_parser.add_argument(
+        "--tone-warmth",
+        choices=WARMTH_LEVELS,
+        default="sobrio",
+        help="Calore del tono editoriale.",
+    )
+    generate_parser.add_argument(
+        "--promotional-intensity",
+        choices=PROMOTIONAL_LEVELS,
+        default="discreto",
+        help="Intensita della CTA e della spinta commerciale.",
     )
 
     list_parser = subparsers.add_parser("list", help="Lista i post salvati.")
@@ -96,12 +114,24 @@ def handle_generate(
     with_images: bool,
     platform: str | None,
     category: str | None,
+    seriousness_level: str,
+    tone_warmth: str,
+    promotional_intensity: str,
 ) -> int:
-    records = generate_posts(count, with_images=with_images, platform=platform, category=category)
+    records = generate_posts(
+        count,
+        with_images=with_images,
+        platform=platform,
+        category=category,
+        seriousness_level=seriousness_level,
+        tone_warmth=tone_warmth,
+        promotional_intensity=promotional_intensity,
+    )
     for post in records:
         image_note = f" image={post.image_path}" if post.image_path else ""
         print(
             f"[draft] id={post.id} platform={post.platform} category={post.category} "
+            f"seriousness={post.seriousness_level} warmth={post.tone_warmth} promo={post.promotional_intensity} "
             f"title={post.title_internal}{image_note}"
         )
     print(f"Creati {len(records)} post in stato draft.")
@@ -119,7 +149,8 @@ def handle_list(status: str | None, limit: int | None) -> int:
     for post in posts:
         print(
             f"id={post.id} status={post.status} platform={post.platform} category={post.category} "
-            f"ratio={post.platform_aspect_ratio or '-'} scheduled_at={post.scheduled_at or '-'} "
+            f"ratio={post.platform_aspect_ratio or '-'} seriousness={post.seriousness_level or '-'} "
+            f"warmth={post.tone_warmth or '-'} promo={post.promotional_intensity or '-'} scheduled_at={post.scheduled_at or '-'} "
             f"image={'yes' if post.image_path else 'no'} "
             f"title={post.title_internal}"
         )
@@ -140,6 +171,9 @@ def handle_show(post_id: int) -> int:
         ("platform", post.platform),
         ("category", post.category),
         ("platform_aspect_ratio", post.platform_aspect_ratio or "-"),
+        ("seriousness_level", post.seriousness_level or "-"),
+        ("tone_warmth", post.tone_warmth or "-"),
+        ("promotional_intensity", post.promotional_intensity or "-"),
         ("title_internal", post.title_internal),
         ("text_short", post.text_short),
         ("text_medium", post.text_medium),
@@ -229,7 +263,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     try:
         if args.command == "generate":
-            return handle_generate(args.count, args.with_images, args.platform, args.category)
+            return handle_generate(
+                args.count,
+                args.with_images,
+                args.platform,
+                args.category,
+                args.seriousness_level,
+                args.tone_warmth,
+                args.promotional_intensity,
+            )
         if args.command == "list":
             return handle_list(args.status, args.limit)
         if args.command == "show":

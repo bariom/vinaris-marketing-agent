@@ -37,6 +37,9 @@ def generate_posts(
     with_images: bool = False,
     platform: str | None = None,
     category: str | None = None,
+    seriousness_level: str = "equilibrato",
+    tone_warmth: str = "sobrio",
+    promotional_intensity: str = "discreto",
     settings: Settings | None = None,
 ) -> list[PostRecord]:
     active_settings = settings or get_settings()
@@ -51,7 +54,14 @@ def generate_posts(
     )
 
     records: list[PostRecord] = []
-    for post in generator.generate_posts(count, platform=platform, category=category):
+    for post in generator.generate_posts(
+        count,
+        platform=platform,
+        category=category,
+        seriousness_level=seriousness_level,
+        tone_warmth=tone_warmth,
+        promotional_intensity=promotional_intensity,
+    ):
         post_id = storage.create_post(post.to_dict())
         if with_images:
             rendered = renderer.render_post_image(
@@ -60,6 +70,9 @@ def generate_posts(
                 title=post.title_internal,
                 prompt=post.image_prompt,
                 aspect_ratio=post.platform_aspect_ratio,
+                seriousness_level=post.seriousness_level or "equilibrato",
+                tone_warmth=post.tone_warmth or "sobrio",
+                promotional_intensity=post.promotional_intensity or "discreto",
             )
             storage.set_image_path(post_id, str(rendered.file_path))
         record = storage.get_post(post_id)
@@ -116,6 +129,9 @@ def render_post_image(post_id: int, settings: Settings | None = None) -> PostRec
         title=post.title_internal,
         prompt=post.image_prompt,
         aspect_ratio=post.platform_aspect_ratio,
+        seriousness_level=post.seriousness_level or "equilibrato",
+        tone_warmth=post.tone_warmth or "sobrio",
+        promotional_intensity=post.promotional_intensity or "discreto",
     )
     storage.set_image_path(post.id, str(rendered.file_path))
     return _require_post(storage, post_id)
@@ -157,6 +173,9 @@ def render_batch_images(
                 title=post.title_internal,
                 prompt=post.image_prompt,
                 aspect_ratio=post.platform_aspect_ratio,
+                seriousness_level=post.seriousness_level or "equilibrato",
+                tone_warmth=post.tone_warmth or "sobrio",
+                promotional_intensity=post.promotional_intensity or "discreto",
             )
             storage.set_image_path(post.id, str(rendered.file_path))
             generated_count += 1
