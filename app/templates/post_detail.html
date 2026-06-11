@@ -57,7 +57,7 @@
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="secondary">Pubblica</button>
         </form>
-        <form method="post" action="{{ url_for('render_image', post_id=post.id) }}">
+        <form method="post" action="{{ url_for('render_image', post_id=post.id) }}" data-loading-message="La AI sta generando l'immagine del post. Attendi il completamento.">
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="ghost">Genera immagine</button>
         </form>

@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
+    <div class="loading-overlay" id="loading-overlay" hidden>
+      <div class="loading-card" role="status" aria-live="polite" aria-atomic="true">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p class="loading-title">Operazione in corso</p>
+        <p class="loading-message" id="loading-message">Il sistema sta lavorando. Attendi qualche secondo.</p>
+      </div>
+    </div>
+
     <header class="site-header">
       <div>
         <p class="eyebrow">Vinaris</p>
@@ -29,5 +37,34 @@
     <main class="page-shell">
       {% block content %}{% endblock %}
     </main>
+
+    <script>
+      const loadingOverlay = document.getElementById("loading-overlay");
+      const loadingMessage = document.getElementById("loading-message");
+
+      function activateLoadingState(form) {
+        if (!loadingOverlay || !loadingMessage) {
+          return;
+        }
+
+        const message = form.dataset.loadingMessage || "Il sistema sta lavorando. Attendi qualche secondo.";
+        loadingMessage.textContent = message;
+        loadingOverlay.hidden = false;
+        document.body.classList.add("is-loading");
+
+        form.querySelectorAll("button, input[type='submit']").forEach((element) => {
+          element.disabled = true;
+        });
+      }
+
+      document.querySelectorAll("form[data-loading-message]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+          if (event.defaultPrevented) {
+            return;
+          }
+          activateLoadingState(form);
+        });
+      });
+    </script>
   </body>
 </html>

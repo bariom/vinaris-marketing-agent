@@ -2,7 +2,7 @@
 
 {% block content %}
   <section class="panel grid-two">
-    <form method="post" action="{{ url_for('generate') }}" class="stack">
+    <form method="post" action="{{ url_for('generate') }}" class="stack" data-loading-message="La AI sta generando i contenuti. Attendi il completamento.">
       <h2>Genera post</h2>
       <label>
         <span>Numero post</span>
@@ -57,7 +57,7 @@
       <button type="submit">Genera bozze</button>
     </form>
 
-    <form method="post" action="{{ url_for('render_batch') }}" class="stack">
+    <form method="post" action="{{ url_for('render_batch') }}" class="stack" data-loading-message="La AI sta generando le immagini del batch. Attendi il completamento.">
       <h2>Render batch</h2>
       <label>
         <span>Stato</span>
@@ -183,7 +183,7 @@
                     <input type="hidden" name="source" value="dashboard">
                     <button type="submit" class="secondary">Pubblica</button>
                   </form>
-                  <form method="post" action="{{ url_for('render_image', post_id=post.id) }}">
+                  <form method="post" action="{{ url_for('render_image', post_id=post.id) }}" data-loading-message="La AI sta generando l'immagine del post. Attendi il completamento.">
                     <input type="hidden" name="source" value="dashboard">
                     <button type="submit" class="ghost">Render</button>
                   </form>
