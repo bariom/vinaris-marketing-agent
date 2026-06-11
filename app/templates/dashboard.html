@@ -50,6 +50,46 @@
           {% endfor %}
         </select>
       </label>
+      <label>
+        <span>Fascia età target</span>
+        <select name="target_age_range">
+          <option value="">Non specificata</option>
+          {% for level in target_age_ranges %}
+            <option value="{{ level }}">{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Genere target</span>
+        <select name="target_gender">
+          <option value="">Non specificato</option>
+          {% for level in target_genders %}
+            <option value="{{ level }}">{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Regione target</span>
+        <input type="text" name="target_region" placeholder="Es. Svizzera italiana, Milano, DACH">
+      </label>
+      <label>
+        <span>Esperienza vino</span>
+        <select name="target_expertise">
+          <option value="">Non specificata</option>
+          {% for level in target_expertise_levels %}
+            <option value="{{ level }}">{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>Potere d'acquisto</span>
+        <select name="target_spending_power">
+          <option value="">Non specificato</option>
+          {% for level in target_spending_powers %}
+            <option value="{{ level }}">{{ level }}</option>
+          {% endfor %}
+        </select>
+      </label>
       <label class="checkbox-row">
         <input type="checkbox" name="with_images">
         <span>Genera anche immagini OpenAI</span>
@@ -166,6 +206,8 @@
                   <span>{{ post.seriousness_level or 'equilibrato' }}</span>
                   <span>{{ post.tone_warmth or 'sobrio' }}</span>
                   <span>{{ post.promotional_intensity or 'discreto' }}</span>
+                  <span>{{ post.target_age_range or 'eta libera' }}</span>
+                  <span>{{ post.target_gender or 'genere misto' }}</span>
                 </div>
               </td>
               <td>{{ "sì" if post.image_path else "no" }}</td>

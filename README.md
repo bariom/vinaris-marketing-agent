@@ -107,6 +107,12 @@ Generare post per piattaforma e categoria:
 python -m app.main generate --count 2 --platform Instagram --category "beta tester"
 ```
 
+Generare post con target più preciso:
+
+```bash
+python -m app.main generate --count 3 --platform Instagram --category "valore della cantina" --target-age-range 45-54 --target-gender misto --target-region "Svizzera italiana" --target-expertise "appassionato" --target-spending-power alto
+```
+
 Generare 10 bozze con immagine OpenAI per ciascuna:
 
 ```bash
@@ -192,6 +198,7 @@ Funzioni disponibili nella dashboard:
 - lista post con filtri per stato e piattaforma
 - pagina dettaglio post
 - generazione nuove bozze
+- targeting audience per età, genere, regione, esperienza vino e potere d'acquisto
 - approvazione e rifiuto manuale
 - pubblicazione simulata
 - generazione immagine singola

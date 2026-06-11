@@ -18,6 +18,11 @@
         <div><dt>Serietà</dt><dd>{{ post.seriousness_level or "equilibrato" }}</dd></div>
         <div><dt>Calore tono</dt><dd>{{ post.tone_warmth or "sobrio" }}</dd></div>
         <div><dt>Spinta promo</dt><dd>{{ post.promotional_intensity or "discreto" }}</dd></div>
+        <div><dt>Età target</dt><dd>{{ post.target_age_range or "-" }}</dd></div>
+        <div><dt>Genere target</dt><dd>{{ post.target_gender or "-" }}</dd></div>
+        <div><dt>Regione target</dt><dd>{{ post.target_region or "-" }}</dd></div>
+        <div><dt>Esperienza vino</dt><dd>{{ post.target_expertise or "-" }}</dd></div>
+        <div><dt>Potere d'acquisto</dt><dd>{{ post.target_spending_power or "-" }}</dd></div>
         <div><dt>Creazione</dt><dd>{{ post.created_at }}</dd></div>
         <div><dt>Pianificata</dt><dd>{{ post.scheduled_at or "-" }}</dd></div>
         <div><dt>Pubblicata</dt><dd>{{ post.published_at or "-" }}</dd></div>
@@ -38,6 +43,13 @@
       <div class="copy-block">
         <h3>Hashtag</h3>
         <p>{{ post.hashtags }}</p>
+      </div>
+      <div class="copy-block">
+        <div class="copy-block-head">
+          <h3>Post pronto da copiare</h3>
+          <button type="button" class="ghost copy-button" data-copy-target="ready-caption">Copia testo</button>
+        </div>
+        <textarea id="ready-caption" class="ready-caption" readonly>{{ ready_caption }}</textarea>
       </div>
       <div class="copy-block">
         <h3>Prompt immagine</h3>
@@ -82,4 +94,25 @@
       {% endif %}
     </aside>
   </section>
+
+  <script>
+    const copyButton = document.querySelector("[data-copy-target='ready-caption']");
+    if (copyButton) {
+      copyButton.addEventListener("click", async () => {
+        const target = document.getElementById(copyButton.dataset.copyTarget);
+        if (!target) return;
+        try {
+          await navigator.clipboard.writeText(target.value);
+          const originalLabel = copyButton.textContent;
+          copyButton.textContent = "Copiato";
+          window.setTimeout(() => {
+            copyButton.textContent = originalLabel;
+          }, 1400);
+        } catch (_error) {
+          target.focus();
+          target.select();
+        }
+      });
+    }
+  </script>
 {% endblock %}

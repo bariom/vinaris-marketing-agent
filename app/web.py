@@ -9,9 +9,14 @@ from app.content_generator import (
     CATEGORIES,
     PROMOTIONAL_LEVELS,
     SERIOUSNESS_LEVELS,
+    TARGET_AGE_RANGES,
+    TARGET_EXPERTISE_LEVELS,
+    TARGET_GENDERS,
+    TARGET_SPENDING_POWERS,
     WARMTH_LEVELS,
 )
 from app.image_renderer import ImageRenderError
+from app.post_formatter import build_ready_caption
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
     approve_post,
@@ -55,6 +60,10 @@ def dashboard():
         seriousness_levels=SERIOUSNESS_LEVELS,
         warmth_levels=WARMTH_LEVELS,
         promotional_levels=PROMOTIONAL_LEVELS,
+        target_age_ranges=TARGET_AGE_RANGES,
+        target_genders=TARGET_GENDERS,
+        target_expertise_levels=TARGET_EXPERTISE_LEVELS,
+        target_spending_powers=TARGET_SPENDING_POWERS,
     )
 
 
@@ -68,7 +77,12 @@ def post_detail(post_id: int):
         return redirect(url_for("dashboard"))
 
     image_url = url_for("serve_image", post_id=post.id) if post.image_path else None
-    return render_template("post_detail.html", post=post, image_url=image_url)
+    return render_template(
+        "post_detail.html",
+        post=post,
+        image_url=image_url,
+        ready_caption=build_ready_caption(post),
+    )
 
 
 @app.get("/images/<int:post_id>")
@@ -96,6 +110,11 @@ def generate():
         seriousness_level = request.form.get("seriousness_level") or "equilibrato"
         tone_warmth = request.form.get("tone_warmth") or "sobrio"
         promotional_intensity = request.form.get("promotional_intensity") or "discreto"
+        target_age_range = request.form.get("target_age_range") or None
+        target_gender = request.form.get("target_gender") or None
+        target_region = request.form.get("target_region") or None
+        target_expertise = request.form.get("target_expertise") or None
+        target_spending_power = request.form.get("target_spending_power") or None
         with_images = requested_with_images and count == 1
 
         records = generate_posts(
@@ -106,6 +125,11 @@ def generate():
             seriousness_level=seriousness_level,
             tone_warmth=tone_warmth,
             promotional_intensity=promotional_intensity,
+            target_age_range=target_age_range,
+            target_gender=target_gender,
+            target_region=target_region,
+            target_expertise=target_expertise,
+            target_spending_power=target_spending_power,
         )
 
         if requested_with_images and count > 1:

@@ -21,6 +21,11 @@ class PostRecord:
     seriousness_level: str | None
     tone_warmth: str | None
     promotional_intensity: str | None
+    target_age_range: str | None
+    target_gender: str | None
+    target_region: str | None
+    target_expertise: str | None
+    target_spending_power: str | None
     title_internal: str
     text_short: str
     text_medium: str
@@ -56,6 +61,11 @@ class PostStorage:
                     seriousness_level TEXT,
                     tone_warmth TEXT,
                     promotional_intensity TEXT,
+                    target_age_range TEXT,
+                    target_gender TEXT,
+                    target_region TEXT,
+                    target_expertise TEXT,
+                    target_spending_power TEXT,
                     title_internal TEXT NOT NULL,
                     text_short TEXT NOT NULL,
                     text_medium TEXT NOT NULL,
@@ -70,9 +80,35 @@ class PostStorage:
                 )
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS generation_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    platform TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    seriousness_level TEXT,
+                    tone_warmth TEXT,
+                    promotional_intensity TEXT,
+                    target_age_range TEXT,
+                    target_gender TEXT,
+                    target_region TEXT,
+                    target_expertise TEXT,
+                    target_spending_power TEXT,
+                    title_internal TEXT NOT NULL,
+                    text_short TEXT NOT NULL,
+                    text_medium TEXT NOT NULL,
+                    cta TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
             columns = {
                 row["name"]
                 for row in connection.execute("PRAGMA table_info(posts)").fetchall()
+            }
+            history_columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(generation_history)").fetchall()
             }
             if "image_path" not in columns:
                 connection.execute("ALTER TABLE posts ADD COLUMN image_path TEXT")
@@ -84,6 +120,26 @@ class PostStorage:
                 connection.execute("ALTER TABLE posts ADD COLUMN tone_warmth TEXT")
             if "promotional_intensity" not in columns:
                 connection.execute("ALTER TABLE posts ADD COLUMN promotional_intensity TEXT")
+            if "target_age_range" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN target_age_range TEXT")
+            if "target_gender" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN target_gender TEXT")
+            if "target_region" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN target_region TEXT")
+            if "target_expertise" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN target_expertise TEXT")
+            if "target_spending_power" not in columns:
+                connection.execute("ALTER TABLE posts ADD COLUMN target_spending_power TEXT")
+            if "target_age_range" not in history_columns:
+                connection.execute("ALTER TABLE generation_history ADD COLUMN target_age_range TEXT")
+            if "target_gender" not in history_columns:
+                connection.execute("ALTER TABLE generation_history ADD COLUMN target_gender TEXT")
+            if "target_region" not in history_columns:
+                connection.execute("ALTER TABLE generation_history ADD COLUMN target_region TEXT")
+            if "target_expertise" not in history_columns:
+                connection.execute("ALTER TABLE generation_history ADD COLUMN target_expertise TEXT")
+            if "target_spending_power" not in history_columns:
+                connection.execute("ALTER TABLE generation_history ADD COLUMN target_spending_power TEXT")
             connection.commit()
 
     def create_post(self, payload: dict[str, Any]) -> int:
@@ -91,10 +147,11 @@ class PostStorage:
             cursor = connection.execute(
                 """
                 INSERT INTO posts (
-                    platform, category, platform_aspect_ratio, seriousness_level, tone_warmth, promotional_intensity, title_internal, text_short, text_medium,
+                    platform, category, platform_aspect_ratio, seriousness_level, tone_warmth, promotional_intensity,
+                    target_age_range, target_gender, target_region, target_expertise, target_spending_power, title_internal, text_short, text_medium,
                     cta, hashtags, image_prompt, status, created_at, scheduled_at, published_at
                     , image_path
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     payload["platform"],
@@ -103,6 +160,11 @@ class PostStorage:
                     payload.get("seriousness_level"),
                     payload.get("tone_warmth"),
                     payload.get("promotional_intensity"),
+                    payload.get("target_age_range"),
+                    payload.get("target_gender"),
+                    payload.get("target_region"),
+                    payload.get("target_expertise"),
+                    payload.get("target_spending_power"),
                     payload["title_internal"],
                     payload["text_short"],
                     payload["text_medium"],
@@ -188,6 +250,75 @@ class PostStorage:
         if cursor.rowcount == 0:
             raise StorageError(f"Post {post_id} non trovato.")
 
+    def archive_generated_post(self, payload: dict[str, Any]) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO generation_history (
+                    platform, category, seriousness_level, tone_warmth, promotional_intensity,
+                    target_age_range, target_gender, target_region, target_expertise, target_spending_power,
+                    title_internal, text_short, text_medium, cta, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    payload["platform"],
+                    payload["category"],
+                    payload.get("seriousness_level"),
+                    payload.get("tone_warmth"),
+                    payload.get("promotional_intensity"),
+                    payload.get("target_age_range"),
+                    payload.get("target_gender"),
+                    payload.get("target_region"),
+                    payload.get("target_expertise"),
+                    payload.get("target_spending_power"),
+                    payload["title_internal"],
+                    payload["text_short"],
+                    payload["text_medium"],
+                    payload["cta"],
+                    payload["created_at"],
+                ),
+            )
+            connection.commit()
+
+    def list_recent_generation_history(self, limit: int = 24) -> list[dict[str, str]]:
+        query = """
+            SELECT
+                platform,
+                category,
+                target_age_range,
+                target_gender,
+                target_region,
+                target_expertise,
+                target_spending_power,
+                title_internal,
+                text_short,
+                text_medium,
+                cta,
+                created_at
+            FROM generation_history
+            ORDER BY datetime(created_at) DESC, id DESC
+            LIMIT ?
+        """
+        with self._connect() as connection:
+            rows = connection.execute(query, (limit,)).fetchall()
+        return [
+            {
+                "platform": str(row["platform"]),
+                "category": str(row["category"]),
+                "target_age_range": str(row["target_age_range"] or ""),
+                "target_gender": str(row["target_gender"] or ""),
+                "target_region": str(row["target_region"] or ""),
+                "target_expertise": str(row["target_expertise"] or ""),
+                "target_spending_power": str(row["target_spending_power"] or ""),
+                "title_internal": str(row["title_internal"]),
+                "text_short": str(row["text_short"]),
+                "text_medium": str(row["text_medium"]),
+                "cta": str(row["cta"]),
+                "created_at": str(row["created_at"]),
+            }
+            for row in rows
+        ]
+
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.db_path)
         connection.row_factory = sqlite3.Row
@@ -205,6 +336,11 @@ class PostStorage:
             seriousness_level=row["seriousness_level"],
             tone_warmth=row["tone_warmth"],
             promotional_intensity=row["promotional_intensity"],
+            target_age_range=row["target_age_range"],
+            target_gender=row["target_gender"],
+            target_region=row["target_region"],
+            target_expertise=row["target_expertise"],
+            target_spending_power=row["target_spending_power"],
             title_internal=row["title_internal"],
             text_short=row["text_short"],
             text_medium=row["text_medium"],

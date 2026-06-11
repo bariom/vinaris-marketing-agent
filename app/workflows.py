@@ -40,6 +40,11 @@ def generate_posts(
     seriousness_level: str = "equilibrato",
     tone_warmth: str = "sobrio",
     promotional_intensity: str = "discreto",
+    target_age_range: str | None = None,
+    target_gender: str | None = None,
+    target_region: str | None = None,
+    target_expertise: str | None = None,
+    target_spending_power: str | None = None,
     settings: Settings | None = None,
 ) -> list[PostRecord]:
     active_settings = settings or get_settings()
@@ -54,6 +59,7 @@ def generate_posts(
     )
 
     records: list[PostRecord] = []
+    recent_history = storage.list_recent_generation_history(limit=36)
     for post in generator.generate_posts(
         count,
         platform=platform,
@@ -61,8 +67,16 @@ def generate_posts(
         seriousness_level=seriousness_level,
         tone_warmth=tone_warmth,
         promotional_intensity=promotional_intensity,
+        target_age_range=target_age_range,
+        target_gender=target_gender,
+        target_region=target_region,
+        target_expertise=target_expertise,
+        target_spending_power=target_spending_power,
+        recent_history=recent_history,
     ):
-        post_id = storage.create_post(post.to_dict())
+        payload = post.to_dict()
+        post_id = storage.create_post(payload)
+        storage.archive_generated_post(payload)
         if with_images:
             rendered = renderer.render_post_image(
                 post_id=post_id,

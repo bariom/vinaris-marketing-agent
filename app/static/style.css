@@ -344,9 +344,32 @@ th {
   margin-bottom: 0.45rem;
 }
 
+.copy-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.copy-block-head h3 {
+  margin: 0;
+}
+
 .copy-block p {
   margin: 0;
   line-height: 1.6;
+}
+
+.ready-caption {
+  min-height: 14rem;
+  resize: vertical;
+  line-height: 1.6;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.copy-button {
+  white-space: nowrap;
 }
 
 .mono {

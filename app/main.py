@@ -4,8 +4,18 @@ import argparse
 from typing import Sequence
 
 from app.config import get_settings
-from app.content_generator import CATEGORIES, PROMOTIONAL_LEVELS, SERIOUSNESS_LEVELS, WARMTH_LEVELS
+from app.content_generator import (
+    CATEGORIES,
+    PROMOTIONAL_LEVELS,
+    SERIOUSNESS_LEVELS,
+    TARGET_AGE_RANGES,
+    TARGET_EXPERTISE_LEVELS,
+    TARGET_GENDERS,
+    TARGET_SPENDING_POWERS,
+    WARMTH_LEVELS,
+)
 from app.image_renderer import ImageRenderError
+from app.post_formatter import build_ready_caption
 from app.storage import PostStorage, StorageError, VALID_STATUSES
 from app.workflows import (
     approve_post,
@@ -57,6 +67,19 @@ def build_parser() -> argparse.ArgumentParser:
         choices=PROMOTIONAL_LEVELS,
         default="discreto",
         help="Intensita della CTA e della spinta commerciale.",
+    )
+    generate_parser.add_argument("--target-age-range", choices=TARGET_AGE_RANGES, help="Fascia di eta target.")
+    generate_parser.add_argument("--target-gender", choices=TARGET_GENDERS, help="Genere target.")
+    generate_parser.add_argument("--target-region", help="Regione o mercato target, es. Svizzera italiana.")
+    generate_parser.add_argument(
+        "--target-expertise",
+        choices=TARGET_EXPERTISE_LEVELS,
+        help="Livello di esperienza vino del target.",
+    )
+    generate_parser.add_argument(
+        "--target-spending-power",
+        choices=TARGET_SPENDING_POWERS,
+        help="Potere d'acquisto del target.",
     )
 
     list_parser = subparsers.add_parser("list", help="Lista i post salvati.")
@@ -117,6 +140,11 @@ def handle_generate(
     seriousness_level: str,
     tone_warmth: str,
     promotional_intensity: str,
+    target_age_range: str | None,
+    target_gender: str | None,
+    target_region: str | None,
+    target_expertise: str | None,
+    target_spending_power: str | None,
 ) -> int:
     records = generate_posts(
         count,
@@ -126,13 +154,19 @@ def handle_generate(
         seriousness_level=seriousness_level,
         tone_warmth=tone_warmth,
         promotional_intensity=promotional_intensity,
+        target_age_range=target_age_range,
+        target_gender=target_gender,
+        target_region=target_region,
+        target_expertise=target_expertise,
+        target_spending_power=target_spending_power,
     )
     for post in records:
         image_note = f" image={post.image_path}" if post.image_path else ""
         print(
             f"[draft] id={post.id} platform={post.platform} category={post.category} "
             f"seriousness={post.seriousness_level} warmth={post.tone_warmth} promo={post.promotional_intensity} "
-            f"title={post.title_internal}{image_note}"
+            f"target_age={post.target_age_range or '-'} target_gender={post.target_gender or '-'} "
+            f"target_region={post.target_region or '-'} title={post.title_internal}{image_note}"
         )
     print(f"Creati {len(records)} post in stato draft.")
     return 0
@@ -151,7 +185,8 @@ def handle_list(status: str | None, limit: int | None) -> int:
             f"id={post.id} status={post.status} platform={post.platform} category={post.category} "
             f"ratio={post.platform_aspect_ratio or '-'} seriousness={post.seriousness_level or '-'} "
             f"warmth={post.tone_warmth or '-'} promo={post.promotional_intensity or '-'} scheduled_at={post.scheduled_at or '-'} "
-            f"image={'yes' if post.image_path else 'no'} "
+            f"target_age={post.target_age_range or '-'} target_gender={post.target_gender or '-'} "
+            f"target_region={post.target_region or '-'} image={'yes' if post.image_path else 'no'} "
             f"title={post.title_internal}"
         )
     return 0
@@ -174,11 +209,17 @@ def handle_show(post_id: int) -> int:
         ("seriousness_level", post.seriousness_level or "-"),
         ("tone_warmth", post.tone_warmth or "-"),
         ("promotional_intensity", post.promotional_intensity or "-"),
+        ("target_age_range", post.target_age_range or "-"),
+        ("target_gender", post.target_gender or "-"),
+        ("target_region", post.target_region or "-"),
+        ("target_expertise", post.target_expertise or "-"),
+        ("target_spending_power", post.target_spending_power or "-"),
         ("title_internal", post.title_internal),
         ("text_short", post.text_short),
         ("text_medium", post.text_medium),
         ("cta", post.cta),
         ("hashtags", post.hashtags),
+        ("post_ready", build_ready_caption(post)),
         ("image_prompt", post.image_prompt),
         ("image_path", post.image_path or "-"),
         ("created_at", post.created_at),
@@ -271,6 +312,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.seriousness_level,
                 args.tone_warmth,
                 args.promotional_intensity,
+                args.target_age_range,
+                args.target_gender,
+                args.target_region,
+                args.target_expertise,
+                args.target_spending_power,
             )
         if args.command == "list":
             return handle_list(args.status, args.limit)

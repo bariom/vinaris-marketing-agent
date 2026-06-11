@@ -5,6 +5,7 @@ import shutil
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from app.post_formatter import build_ready_caption
 from app.storage import PostRecord
 
 
@@ -51,11 +52,7 @@ def export_post_pack(post: PostRecord, exports_dir: Path) -> ExportResult:
 
 
 def _build_caption(post: PostRecord) -> str:
-    return (
-        f"{post.text_medium}\n\n"
-        f"{post.cta}\n\n"
-        f"{post.hashtags}\n"
-    )
+    return f"{build_ready_caption(post)}\n"
 
 
 def _build_export_folder_name(post: PostRecord) -> str:
