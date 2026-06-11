@@ -266,6 +266,10 @@ th {
   z-index: 1000;
 }
 
+.loading-overlay[hidden] {
+  display: none;
+}
+
 .loading-card {
   width: min(420px, 100%);
   padding: 1.4rem;
