@@ -107,6 +107,11 @@ Generare post per piattaforma e categoria:
 python -m app.main generate --count 2 --platform Instagram --category "beta tester"
 ```
 
+Nota Instagram:
+
+- la generazione usa 5 hashtag fissi: `#winecellar #winecollector #finewine #winelover #vinaris`
+- la rilevanza del contenuto viene spinta soprattutto tramite keyword nel testo del post
+
 Generare post con target più preciso:
 
 ```bash

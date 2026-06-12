@@ -254,10 +254,18 @@ FORBIDDEN_META_PATTERNS = (
 )
 
 PLATFORM_HASHTAG_COUNTS = {
-    "Instagram": 8,
+    "Instagram": 5,
     "Facebook": 5,
     "LinkedIn": 4,
 }
+
+INSTAGRAM_FIXED_HASHTAGS = (
+    "#winecellar",
+    "#winecollector",
+    "#finewine",
+    "#winelover",
+    "#vinaris",
+)
 
 CORE_HASHTAGS = {
     "Instagram": ("#Vinaris", "#WineCollection", "#CantinaPrivata"),
@@ -280,6 +288,17 @@ QUALITY_HASHTAGS = {
     "alto": ("#FineWine", "#CollectionStrategy"),
     "equilibrato": ("#WineCollection", "#CellarInsights"),
     "leggero": ("#WineLovers", "#CellarLife"),
+}
+
+CATEGORY_KEYWORDS = {
+    "gestione cantina": ("cantina vini", "inventario vini", "gestione cantina", "cantina privata"),
+    "errori comuni dei collezionisti": ("collezione vini", "wine collector", "errori di cantina", "gestione bottiglie"),
+    "finestre di beva": ("finestra di beva", "quando stappare", "maturazione vino", "fine wine"),
+    "valore della cantina": ("valore della cantina", "collezione vini", "fine wine", "patrimonio enologico"),
+    "wishlist": ("wishlist vini", "acquisto vino", "collezione vini", "fine wine"),
+    "consegne": ("consegna vino", "cantina privata", "registrazione bottiglie", "inventario vini"),
+    "beta tester": ("app per cantina", "cantina vini", "wine collector", "beta tester"),
+    "funzioni Vinaris": ("app cantina vini", "gestione cantina", "inventario vini", "collezione vini"),
 }
 
 CATEGORY_BUILDING_BLOCKS: dict[str, dict[str, tuple[str, ...]]] = {
@@ -897,6 +916,7 @@ class ContentGenerator:
             target_expertise=target_expertise,
             target_spending_power=target_spending_power,
         )
+        keyword_rule = self._build_keyword_rule(category)
         return f"""
 Genera {count} post social in JSON puro come array.
 
@@ -923,6 +943,8 @@ Vincoli:
 - evita di riusare la stessa CTA, la stessa frase finale o lo stesso schema di due frasi in post consecutivi
 - rendi ogni post distinto per prospettiva: alcuni piu analitici, altri piu osservazionali, altri piu concreti
 - se menzioni la beta, fallo solo quando serve davvero al post: non renderla il centro obbligatorio di ogni copy
+- priorita discovery: inserisci le keyword principali nel titolo, nel text_short e nel text_medium in modo naturale, senza keyword stuffing
+- keyword guide: {keyword_rule}
 
 Direzioni creative da distribuire nel batch:
 {creative_bullets}
@@ -937,8 +959,8 @@ Regole:
 - text_short massimo 320 caratteri
 - text_medium massimo 700 caratteri
 - hashtags in una singola stringa
-- hashtags mirati e credibili, non generici: combina brand, tema del post, intento del contenuto e 1-2 tag piu ampi ma pertinenti
-- numero hashtag: Instagram 6-8, Facebook 3-5, LinkedIn 3-4
+- per Instagram usa esattamente questi 5 hashtag, nello stesso ordine: #winecellar #winecollector #finewine #winelover #vinaris
+- per Facebook e LinkedIn usa pochi hashtag pertinenti e credibili
 - evita hashtag inutili o troppo vaghi tipo #love #passion #luxurylife #winetime
 - image_angle descrive il concetto visivo in inglese
 - nessun testo fuori dal JSON
@@ -1007,7 +1029,8 @@ Regole:
             target_expertise=target_expertise,
             target_spending_power=target_spending_power,
         )
-        medium = f"{hook} {body}{audience_hint}"
+        keyword_hint = self._build_keyword_hint(category_name)
+        medium = f"{hook} {body}{audience_hint}{keyword_hint}"
         hashtags = self._build_hashtag_string(
             platform_name,
             category_name,
@@ -1099,6 +1122,25 @@ Regole:
             return ""
         return " " + ". ".join(hints) + "."
 
+    @staticmethod
+    def _build_keyword_rule(category_name: str | None) -> str:
+        if category_name:
+            keywords = CATEGORY_KEYWORDS.get(category_name, ())
+            if keywords:
+                return ", ".join(keywords)
+        fallback: list[str] = []
+        for items in CATEGORY_KEYWORDS.values():
+            fallback.extend(items[:2])
+        deduped = list(dict.fromkeys(fallback))
+        return ", ".join(deduped[:10])
+
+    @staticmethod
+    def _build_keyword_hint(category_name: str) -> str:
+        keywords = CATEGORY_KEYWORDS.get(category_name, ())
+        if not keywords:
+            return ""
+        return f" Keyword narrative da mantenere naturale nel testo: {keywords[0]}, {keywords[1]}."
+
     def _normalize_hashtags(
         self,
         platform_name: str,
@@ -1107,6 +1149,9 @@ Regole:
         *,
         seriousness_level: str,
     ) -> str:
+        if platform_name == "Instagram":
+            return " ".join(INSTAGRAM_FIXED_HASHTAGS)
+
         found = re.findall(r"#?[A-Za-z0-9_À-ÿ]+", raw_hashtags)
         cleaned: list[str] = []
         for tag in found:
@@ -1160,6 +1205,9 @@ Regole:
         *,
         seriousness_level: str,
     ) -> tuple[str, ...]:
+        if platform_name == "Instagram":
+            return INSTAGRAM_FIXED_HASHTAGS
+
         pool = list(CORE_HASHTAGS.get(platform_name, ("#Vinaris",)))
         pool.extend(CATEGORY_HASHTAGS.get(category_name, ()))
         pool.extend(QUALITY_HASHTAGS.get(seriousness_level, ()))
