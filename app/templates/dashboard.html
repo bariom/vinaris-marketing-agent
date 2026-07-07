@@ -1,168 +1,194 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="panel grid-two">
-    <form method="post" action="{{ url_for('generate') }}" class="stack" data-loading-message="La AI sta generando i contenuti. Attendi il completamento.">
-      <h2>Genera post</h2>
-      <label>
-        <span>Numero post</span>
-        <input type="number" name="count" value="5" min="1" max="50">
-      </label>
-      <label>
-        <span>Piattaforma</span>
-        <select name="platform">
-          <option value="">Mista</option>
-          {% for platform in platforms %}
-            <option value="{{ platform }}">{{ platform }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Categoria</span>
-        <select name="category">
-          <option value="">Mista</option>
-          {% for category in categories %}
-            <option value="{{ category }}">{{ category }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Livello di serietà</span>
-        <select name="seriousness_level">
-          {% for level in seriousness_levels %}
-            <option value="{{ level }}" {% if level == 'equilibrato' %}selected{% endif %}>{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Calore del tono</span>
-        <select name="tone_warmth">
-          {% for level in warmth_levels %}
-            <option value="{{ level }}" {% if level == 'sobrio' %}selected{% endif %}>{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Spinta promozionale</span>
-        <select name="promotional_intensity">
-          {% for level in promotional_levels %}
-            <option value="{{ level }}" {% if level == 'discreto' %}selected{% endif %}>{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Fascia età target</span>
-        <select name="target_age_range">
-          <option value="">Non specificata</option>
-          {% for level in target_age_ranges %}
-            <option value="{{ level }}">{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Genere target</span>
-        <select name="target_gender">
-          <option value="">Non specificato</option>
-          {% for level in target_genders %}
-            <option value="{{ level }}">{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Regione target</span>
-        <input type="text" name="target_region" placeholder="Es. Svizzera italiana, Milano, DACH">
-      </label>
-      <label>
-        <span>Esperienza vino</span>
-        <select name="target_expertise">
-          <option value="">Non specificata</option>
-          {% for level in target_expertise_levels %}
-            <option value="{{ level }}">{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Potere d'acquisto</span>
-        <select name="target_spending_power">
-          <option value="">Non specificato</option>
-          {% for level in target_spending_powers %}
-            <option value="{{ level }}">{{ level }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label class="checkbox-row">
-        <input type="checkbox" name="with_images">
-        <span>Genera anche immagini OpenAI</span>
-      </label>
-      <button type="submit">Genera bozze</button>
-    </form>
+  <section class="workspace-grid">
+    <article class="panel stack">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Creazione</p>
+          <h2>Genera nuove bozze</h2>
+        </div>
+        <span class="status-pill">AI copy</span>
+      </div>
 
-    <form method="post" action="{{ url_for('render_batch') }}" class="stack" data-loading-message="La AI sta generando le immagini del batch. Attendi il completamento.">
-      <h2>Render batch</h2>
-      <label>
-        <span>Stato</span>
-        <select name="status">
-          {% for status in valid_statuses %}
-            <option value="{{ status }}" {% if status == 'draft' %}selected{% endif %}>{{ status }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Piattaforma</span>
-        <select name="platform">
-          <option value="">Tutte</option>
-          {% for platform in platforms %}
-            <option value="{{ platform }}">{{ platform }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Limite</span>
-        <input type="number" name="limit" min="1" placeholder="Opzionale">
-      </label>
-      <label class="checkbox-row">
-        <input type="checkbox" name="only_missing" checked>
-        <span>Solo post senza immagine</span>
-      </label>
-      <button type="submit">Lancia render batch</button>
-    </form>
+      <form method="post" action="{{ url_for('generate') }}" class="form-grid" data-loading-message="La AI sta generando i contenuti. Attendi il completamento.">
+        <label>
+          <span>Numero post</span>
+          <input type="number" name="count" value="5" min="1" max="50">
+        </label>
+        <label>
+          <span>Piattaforma</span>
+          <select name="platform">
+            <option value="">Mista</option>
+            {% for platform in platforms %}
+              <option value="{{ platform }}">{{ platform }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Categoria</span>
+          <select name="category">
+            <option value="">Mista</option>
+            {% for category in categories %}
+              <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Livello di seriet&agrave;</span>
+          <select name="seriousness_level">
+            {% for level in seriousness_levels %}
+              <option value="{{ level }}" {% if level == 'equilibrato' %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Calore del tono</span>
+          <select name="tone_warmth">
+            {% for level in warmth_levels %}
+              <option value="{{ level }}" {% if level == 'sobrio' %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Spinta promozionale</span>
+          <select name="promotional_intensity">
+            {% for level in promotional_levels %}
+              <option value="{{ level }}" {% if level == 'discreto' %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Fascia et&agrave; target</span>
+          <select name="target_age_range">
+            <option value="">Non specificata</option>
+            {% for level in target_age_ranges %}
+              <option value="{{ level }}">{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Genere target</span>
+          <select name="target_gender">
+            <option value="">Non specificato</option>
+            {% for level in target_genders %}
+              <option value="{{ level }}">{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Regione target</span>
+          <input type="text" name="target_region" placeholder="Svizzera italiana, Milano, DACH">
+        </label>
+        <label>
+          <span>Esperienza vino</span>
+          <select name="target_expertise">
+            <option value="">Non specificata</option>
+            {% for level in target_expertise_levels %}
+              <option value="{{ level }}">{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Potere d'acquisto</span>
+          <select name="target_spending_power">
+            <option value="">Non specificato</option>
+            {% for level in target_spending_powers %}
+              <option value="{{ level }}">{{ level }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" name="with_images">
+          <span>Genera anche immagine se il batch contiene un solo post</span>
+        </label>
+        <div class="form-actions">
+          <button type="submit">Genera bozze</button>
+        </div>
+      </form>
+    </article>
+
+    <aside class="side-rail stack">
+      <section class="panel stack">
+        <div class="section-head compact">
+          <div>
+            <p class="eyebrow">Immagini</p>
+            <h2>Render batch</h2>
+          </div>
+        </div>
+        <form method="post" action="{{ url_for('render_batch') }}" class="stack" data-loading-message="La AI sta generando le immagini del batch. Attendi il completamento.">
+          <label>
+            <span>Stato</span>
+            <select name="status">
+              {% for status in valid_statuses %}
+                <option value="{{ status }}" {% if status == 'draft' %}selected{% endif %}>{{ status }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>
+            <span>Piattaforma</span>
+            <select name="platform">
+              <option value="">Tutte</option>
+              {% for platform in platforms %}
+                <option value="{{ platform }}">{{ platform }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <label>
+            <span>Limite</span>
+            <input type="number" name="limit" min="1" placeholder="Opzionale">
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" name="only_missing" checked>
+            <span>Solo senza immagine</span>
+          </label>
+          <button type="submit" class="secondary">Lancia render</button>
+        </form>
+      </section>
+
+      <section class="stats-grid">
+        {% for status, count in stats.items() %}
+          <article class="stat-card">
+            <p class="stat-label">{{ status }}</p>
+            <p class="stat-value">{{ count }}</p>
+          </article>
+        {% endfor %}
+      </section>
+    </aside>
   </section>
 
-  <section class="stats-grid">
-    {% for status, count in stats.items() %}
-      <article class="stat-card">
-        <p class="stat-label">{{ status }}</p>
-        <p class="stat-value">{{ count }}</p>
-      </article>
-    {% endfor %}
-  </section>
+  <section class="panel stack content-panel">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Archivio</p>
+        <h2>Post generati</h2>
+      </div>
+      <form method="get" action="{{ url_for('dashboard') }}" class="toolbar">
+        <label>
+          <span>Stato</span>
+          <select name="status">
+            <option value="">Tutti</option>
+            {% for status in valid_statuses %}
+              <option value="{{ status }}" {% if active_status == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span>Piattaforma</span>
+          <select name="platform">
+            <option value="">Tutte</option>
+            {% for platform in platforms %}
+              <option value="{{ platform }}" {% if active_platform == platform %}selected{% endif %}>{{ platform }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit" class="secondary">Filtra</button>
+      </form>
+    </div>
 
-  <section class="panel stack">
-    <form method="get" action="{{ url_for('dashboard') }}" class="toolbar">
-      <label>
-        <span>Stato</span>
-        <select name="status">
-          <option value="">Tutti</option>
-          {% for status in valid_statuses %}
-            <option value="{{ status }}" {% if active_status == status %}selected{% endif %}>{{ status }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <label>
-        <span>Piattaforma</span>
-        <select name="platform">
-          <option value="">Tutte</option>
-          {% for platform in platforms %}
-            <option value="{{ platform }}" {% if active_platform == platform %}selected{% endif %}>{{ platform }}</option>
-          {% endfor %}
-        </select>
-      </label>
-      <button type="submit">Applica filtri</button>
-    </form>
-
-    <form method="post" action="{{ url_for('delete_selected') }}" id="bulk-delete-form" class="toolbar bulk-toolbar" onsubmit="return confirmBulkDelete();">
-      <button type="submit" class="ghost" id="bulk-delete-button" disabled>Elimina selezionati</button>
-      <span class="subhead" id="selection-count">0 selezionati</span>
+    <form method="post" action="{{ url_for('delete_selected') }}" id="bulk-delete-form" class="bulk-toolbar" onsubmit="return confirmBulkDelete();">
+      <span class="selection-copy" id="selection-count">0 selezionati</span>
+      <button type="submit" class="ghost danger" id="bulk-delete-button" disabled>Elimina selezionati</button>
     </form>
 
     <div class="table-scroll">
@@ -195,13 +221,13 @@
                   aria-label="Seleziona post {{ post.id }}"
                 >
               </td>
-              <td>{{ post.id }}</td>
+              <td class="id-cell">{{ post.id }}</td>
               <td><span class="badge badge-{{ post.status }}">{{ post.status }}</span></td>
               <td>{{ post.platform }}</td>
               <td>{{ post.category }}</td>
               <td>{{ post.platform_aspect_ratio }}</td>
               <td>
-                <a href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title_internal }}</a>
+                <a class="title-link" href="{{ url_for('post_detail', post_id=post.id) }}">{{ post.title_internal }}</a>
                 <div class="post-meta-inline">
                   <span>{{ post.seriousness_level or 'equilibrato' }}</span>
                   <span>{{ post.tone_warmth or 'sobrio' }}</span>
@@ -210,7 +236,11 @@
                   <span>{{ post.target_gender or 'genere misto' }}</span>
                 </div>
               </td>
-              <td>{{ "sì" if post.image_path else "no" }}</td>
+              <td>
+                <span class="image-state {{ 'is-ready' if post.image_path else 'is-missing' }}">
+                  {{ "si" if post.image_path else "no" }}
+                </span>
+              </td>
               <td>
                 <div class="action-row">
                   <form method="post" action="{{ url_for('approve', post_id=post.id) }}">
@@ -235,14 +265,14 @@
                   </form>
                   <form method="post" action="{{ url_for('delete', post_id=post.id) }}" onsubmit="return confirm('Eliminare definitivamente questo post?');">
                     <input type="hidden" name="source" value="dashboard">
-                    <button type="submit" class="ghost">Elimina</button>
+                    <button type="submit" class="ghost danger">Elimina</button>
                   </form>
                 </div>
               </td>
             </tr>
           {% else %}
             <tr>
-              <td colspan="9">Nessun post trovato.</td>
+              <td colspan="9" class="empty-state">Nessun post trovato.</td>
             </tr>
           {% endfor %}
         </tbody>

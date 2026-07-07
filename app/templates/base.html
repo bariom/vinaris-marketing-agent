@@ -16,12 +16,14 @@
     </div>
 
     <header class="site-header">
-      <div>
+      <a class="brand-block" href="{{ url_for('dashboard') }}" aria-label="Torna alla dashboard">
         <p class="eyebrow">Vinaris</p>
         <h1>Marketing Agent</h1>
         <p class="subhead">Private cellar intelligence</p>
-      </div>
-      <a class="header-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+      </a>
+      <nav class="top-nav" aria-label="Navigazione principale">
+        <a class="header-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+      </nav>
     </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}

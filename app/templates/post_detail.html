@@ -7,18 +7,20 @@
         <div>
           <p class="eyebrow">Post #{{ post.id }}</p>
           <h2>{{ post.title_internal }}</h2>
+          <div class="detail-context">
+            <span>{{ post.platform }}</span>
+            <span>{{ post.category }}</span>
+            <span>{{ post.platform_aspect_ratio }}</span>
+          </div>
         </div>
         <span class="badge badge-{{ post.status }}">{{ post.status }}</span>
       </div>
 
       <dl class="meta-grid">
-        <div><dt>Piattaforma</dt><dd>{{ post.platform }}</dd></div>
-        <div><dt>Categoria</dt><dd>{{ post.category }}</dd></div>
-        <div><dt>Formato</dt><dd>{{ post.platform_aspect_ratio }}</dd></div>
-        <div><dt>Serietà</dt><dd>{{ post.seriousness_level or "equilibrato" }}</dd></div>
+        <div><dt>Seriet&agrave;</dt><dd>{{ post.seriousness_level or "equilibrato" }}</dd></div>
         <div><dt>Calore tono</dt><dd>{{ post.tone_warmth or "sobrio" }}</dd></div>
         <div><dt>Spinta promo</dt><dd>{{ post.promotional_intensity or "discreto" }}</dd></div>
-        <div><dt>Età target</dt><dd>{{ post.target_age_range or "-" }}</dd></div>
+        <div><dt>Et&agrave; target</dt><dd>{{ post.target_age_range or "-" }}</dd></div>
         <div><dt>Genere target</dt><dd>{{ post.target_gender or "-" }}</dd></div>
         <div><dt>Regione target</dt><dd>{{ post.target_region or "-" }}</dd></div>
         <div><dt>Esperienza vino</dt><dd>{{ post.target_expertise or "-" }}</dd></div>
@@ -28,35 +30,39 @@
         <div><dt>Pubblicata</dt><dd>{{ post.published_at or "-" }}</dd></div>
       </dl>
 
-      <div class="copy-block">
-        <h3>Testo breve</h3>
-        <p>{{ post.text_short }}</p>
+      <div class="copy-grid">
+        <section class="copy-block">
+          <h3>Testo breve</h3>
+          <p>{{ post.text_short }}</p>
+        </section>
+        <section class="copy-block">
+          <h3>Testo medio</h3>
+          <p>{{ post.text_medium }}</p>
+        </section>
+        <section class="copy-block compact-copy">
+          <h3>CTA</h3>
+          <p>{{ post.cta }}</p>
+        </section>
+        <section class="copy-block compact-copy">
+          <h3>Hashtag</h3>
+          <p>{{ post.hashtags }}</p>
+        </section>
       </div>
-      <div class="copy-block">
-        <h3>Testo medio</h3>
-        <p>{{ post.text_medium }}</p>
-      </div>
-      <div class="copy-block">
-        <h3>CTA</h3>
-        <p>{{ post.cta }}</p>
-      </div>
-      <div class="copy-block">
-        <h3>Hashtag</h3>
-        <p>{{ post.hashtags }}</p>
-      </div>
-      <div class="copy-block">
+
+      <section class="copy-block">
         <div class="copy-block-head">
           <h3>Post pronto da copiare</h3>
           <button type="button" class="ghost copy-button" data-copy-target="ready-caption">Copia testo</button>
         </div>
         <textarea id="ready-caption" class="ready-caption" readonly>{{ ready_caption }}</textarea>
-      </div>
-      <div class="copy-block">
-        <h3>Prompt immagine</h3>
-        <p class="mono">{{ post.image_prompt }}</p>
-      </div>
+      </section>
 
-      <div class="action-row">
+      <section class="copy-block">
+        <h3>Prompt immagine</h3>
+        <p class="mono prompt-copy">{{ post.image_prompt }}</p>
+      </section>
+
+      <div class="action-row detail-actions">
         <form method="post" action="{{ url_for('approve', post_id=post.id) }}">
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="secondary">Approva</button>
@@ -79,18 +85,25 @@
         </form>
         <form method="post" action="{{ url_for('delete', post_id=post.id) }}" onsubmit="return confirm('Eliminare definitivamente questo post e i suoi asset?');">
           <input type="hidden" name="source" value="detail">
-          <button type="submit" class="ghost">Elimina</button>
+          <button type="submit" class="ghost danger">Elimina</button>
         </form>
       </div>
     </article>
 
-    <aside class="panel stack">
-      <h3>Anteprima immagine</h3>
+    <aside class="panel stack preview-panel">
+      <div class="section-head compact">
+        <div>
+          <p class="eyebrow">Asset</p>
+          <h2>Anteprima immagine</h2>
+        </div>
+      </div>
       {% if image_url %}
         <img src="{{ image_url }}" alt="Immagine post {{ post.id }}" class="preview-image">
-        <p class="mono">{{ post.image_path }}</p>
+        <p class="mono asset-path">{{ post.image_path }}</p>
       {% else %}
-        <p>Nessuna immagine generata per questo post.</p>
+        <div class="image-placeholder">
+          <p>Nessuna immagine generata.</p>
+        </div>
       {% endif %}
     </aside>
   </section>
