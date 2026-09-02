@@ -26,6 +26,9 @@ class Settings:
     brand_payoff: str
     primary_language: str
     openai_api_key: str | None
+    openai_text_model: str
+    openai_reasoning_effort: str
+    openai_text_verbosity: str
     openai_image_model: str
     openai_image_quality: str
     openai_image_format: str
@@ -54,6 +57,9 @@ def get_settings() -> Settings:
         brand_payoff="Private cellar intelligence",
         primary_language="it",
         openai_api_key=os.getenv("OPENAI_API_KEY"),
+        openai_text_model=os.getenv("OPENAI_TEXT_MODEL", "gpt-5.6-terra"),
+        openai_reasoning_effort=os.getenv("OPENAI_REASONING_EFFORT", "low"),
+        openai_text_verbosity=os.getenv("OPENAI_TEXT_VERBOSITY", "low"),
         openai_image_model=os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-2"),
         openai_image_quality=os.getenv("OPENAI_IMAGE_QUALITY", "medium"),
         openai_image_format=os.getenv("OPENAI_IMAGE_FORMAT", "png"),

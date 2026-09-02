@@ -49,7 +49,12 @@ def generate_posts(
 ) -> list[PostRecord]:
     active_settings = settings or get_settings()
     storage = build_storage(active_settings)
-    generator = ContentGenerator(active_settings.openai_api_key)
+    generator = ContentGenerator(
+        active_settings.openai_api_key,
+        text_model=active_settings.openai_text_model,
+        reasoning_effort=active_settings.openai_reasoning_effort,
+        text_verbosity=active_settings.openai_text_verbosity,
+    )
     renderer = OpenAIImageRenderer(
         api_key=active_settings.openai_api_key,
         output_dir=active_settings.generated_images_dir,

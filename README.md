@@ -70,6 +70,9 @@ cp .env.example .env
 Variabili supportate:
 
 - `OPENAI_API_KEY`: chiave OpenAI per testo e immagini
+- `OPENAI_TEXT_MODEL`: modello testo, default `gpt-5.6-terra` (alternative: `gpt-5.6-sol`, `gpt-5.6-luna`)
+- `OPENAI_REASONING_EFFORT`: effort di ragionamento (`none`, `low`, `medium`, `high`, `xhigh`, `max`), default `low`
+- `OPENAI_TEXT_VERBOSITY`: verbosita output (`low`, `medium`, `high`), default `low`
 - `OPENAI_IMAGE_MODEL`: modello immagini, default `gpt-image-2`
 - `OPENAI_IMAGE_QUALITY`: qualita immagini, default `medium`
 - `OPENAI_IMAGE_FORMAT`: formato immagini, default `png`
@@ -285,4 +288,9 @@ deploy/nginx.vinaris-marketing-agent.conf.example
 - Codice tipizzato con type hints
 - Fallback automatico a contenuti mock se OpenAI non e configurato o non disponibile
 - Architettura pronta per future integrazioni API social
+- Integrazione testi via Responses API con Structured Outputs e reasoning configurabile
 - Integrazione immagini via OpenAI Image API
+
+### Configurazione GPT-5.6
+
+Il profilo predefinito usa GPT-5.6 Terra per un buon equilibrio tra qualita e costo. Per campagne premium o copy strategico si puo usare `OPENAI_TEXT_MODEL=gpt-5.6-sol` con `OPENAI_REASONING_EFFORT=medium`; per grandi volumi, `gpt-5.6-luna` con `low` o `none` riduce il costo e la latenza.

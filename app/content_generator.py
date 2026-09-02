@@ -37,6 +37,34 @@ TARGET_GENDERS = ("uomo", "donna", "misto")
 TARGET_EXPERTISE_LEVELS = ("neofita", "appassionato", "collezionista esperto", "misto")
 TARGET_SPENDING_POWERS = ("medio", "medio-alto", "alto", "luxury")
 
+# Responses API Structured Outputs keeps the generation contract stable and
+# removes the need to recover JSON from markdown or prose.
+_SOCIAL_POST_ITEM_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "platform": {"type": "string", "enum": list(PLATFORMS)},
+        "category": {"type": "string", "enum": list(CATEGORIES)},
+        "title_internal": {"type": "string"},
+        "text_short": {"type": "string"},
+        "text_medium": {"type": "string"},
+        "cta": {"type": "string"},
+        "hashtags": {"type": "string"},
+        "image_angle": {"type": "string"},
+    },
+    "required": [
+        "platform", "category", "title_internal", "text_short",
+        "text_medium", "cta", "hashtags", "image_angle",
+    ],
+    "additionalProperties": False,
+}
+
+_SOCIAL_POSTS_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {"posts": {"type": "array", "items": _SOCIAL_POST_ITEM_SCHEMA}},
+    "required": ["posts"],
+    "additionalProperties": False,
+}
+
 MOCK_ANGLES: dict[str, list[dict[str, str]]] = {
     "gestione cantina": [
         {
@@ -574,9 +602,20 @@ class GeneratedPost:
 
 
 class ContentGenerator:
-    def __init__(self, openai_api_key: str | None, brand: BrandProfile = VINARIS_BRAND) -> None:
+    def __init__(
+        self,
+        openai_api_key: str | None,
+        brand: BrandProfile = VINARIS_BRAND,
+        *,
+        text_model: str = "gpt-5.6-terra",
+        reasoning_effort: str = "low",
+        text_verbosity: str = "low",
+    ) -> None:
         self.openai_api_key = openai_api_key
         self.brand = brand
+        self.text_model = text_model
+        self.reasoning_effort = reasoning_effort
+        self.text_verbosity = text_verbosity
 
     def generate_posts(
         self,
@@ -701,14 +740,26 @@ class ContentGenerator:
 
         try:
             response = client.responses.create(
-                model="gpt-4.1-mini",
+                model=self.text_model,
                 input=prompt,
+                reasoning={"effort": self.reasoning_effort},
+                text={
+                    "verbosity": self.text_verbosity,
+                    "format": {
+                        "type": "json_schema",
+                        "name": "vinaris_social_posts",
+                        "strict": True,
+                        "schema": _SOCIAL_POSTS_SCHEMA,
+                    },
+                },
             )
             raw_text = getattr(response, "output_text", "").strip()
             data = json.loads(self._extract_json_payload(raw_text))
         except Exception:
             return []
 
+        if isinstance(data, dict):
+            data = data.get("posts")
         if not isinstance(data, list):
             return []
 
@@ -952,7 +1003,7 @@ Direzioni creative da distribuire nel batch:
 Post recenti da non imitare o parafrasare:
 {recent_examples}
 
-Per ogni oggetto JSON usa queste chiavi:
+Restituisci un singolo oggetto JSON con la chiave "posts". Ogni elemento di "posts" usa queste chiavi:
 platform, category, title_internal, text_short, text_medium, cta, hashtags, image_angle
 
 Regole:
