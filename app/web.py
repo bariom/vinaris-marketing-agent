@@ -27,6 +27,9 @@ from app.workflows import (
     reject_post,
     render_batch_images,
     render_post_image,
+    render_post_variants,
+    refine_post_image,
+    select_post_image_asset,
 )
 
 
@@ -76,11 +79,14 @@ def post_detail(post_id: int):
         flash(f"Post {post_id} non trovato.", "error")
         return redirect(url_for("dashboard"))
 
+    image_assets = storage.list_image_assets(post.id)
     image_url = url_for("serve_image", post_id=post.id) if post.image_path else None
     return render_template(
         "post_detail.html",
         post=post,
         image_url=image_url,
+        image_assets=image_assets,
+        brand_reference_count=_brand_reference_count(settings.brand_references_dir),
         ready_caption=build_ready_caption(post),
     )
 
@@ -96,6 +102,21 @@ def serve_image(post_id: int):
     image_path = Path(post.image_path)
     if not image_path.exists():
         flash(f"Immagine del post {post_id} non trovata sul filesystem.", "error")
+        return redirect(url_for("post_detail", post_id=post_id))
+    return send_file(image_path)
+
+
+@app.get("/posts/<int:post_id>/assets/<int:asset_id>")
+def serve_image_asset(post_id: int, asset_id: int):
+    settings = get_settings()
+    storage = PostStorage(settings.database_path)
+    asset = next((item for item in storage.list_image_assets(post_id) if item.id == asset_id), None)
+    if asset is None:
+        flash("Asset immagine non trovato.", "error")
+        return redirect(url_for("post_detail", post_id=post_id))
+    image_path = Path(asset.file_path)
+    if not image_path.exists():
+        flash("Il file dell'asset non e disponibile sul filesystem.", "error")
         return redirect(url_for("post_detail", post_id=post_id))
     return send_file(image_path)
 
@@ -173,6 +194,38 @@ def render_image(post_id: int):
         post = render_post_image(post_id)
         flash(f"Immagine generata per il post {post.id}.", "success")
     except (StorageError, ImageRenderError) as exc:
+        flash(str(exc), "error")
+    return redirect(_redirect_target(post_id))
+
+
+@app.post("/posts/<int:post_id>/render-variants")
+def render_variants(post_id: int):
+    try:
+        count = int(request.form.get("count", "3"))
+        result = render_post_variants(post_id, count=count)
+        flash(f"Generate {result.generated_count} varianti. Seleziona quella da usare per l'export.", "success")
+    except (StorageError, ImageRenderError, ValueError) as exc:
+        flash(str(exc), "error")
+    return redirect(_redirect_target(post_id))
+
+
+@app.post("/posts/<int:post_id>/assets/<int:asset_id>/select")
+def select_image_asset(post_id: int, asset_id: int):
+    try:
+        select_post_image_asset(post_id, asset_id)
+        flash("Immagine selezionata per anteprima ed export.", "success")
+    except StorageError as exc:
+        flash(str(exc), "error")
+    return redirect(_redirect_target(post_id))
+
+
+@app.post("/posts/<int:post_id>/refine-image")
+def refine_image(post_id: int):
+    try:
+        instruction = request.form.get("instruction", "")
+        refine_post_image(post_id, instruction)
+        flash("Immagine rifinita e impostata come selezionata.", "success")
+    except (StorageError, ImageRenderError, ValueError) as exc:
         flash(str(exc), "error")
     return redirect(_redirect_target(post_id))
 
@@ -259,6 +312,12 @@ def _redirect_target(post_id: int):
     if source == "detail":
         return url_for("post_detail", post_id=post_id)
     return url_for("dashboard")
+
+
+def _brand_reference_count(reference_dir: Path) -> int:
+    if not reference_dir.is_dir():
+        return 0
+    return sum(1 for path in reference_dir.iterdir() if path.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"})
 
 
 if __name__ == "__main__":

@@ -27,6 +27,13 @@ class RenderBatchResult:
     items: list[RenderBatchItemResult]
 
 
+@dataclass(slots=True)
+class RenderVariantsResult:
+    post_id: int
+    generated_count: int
+    selected_asset_id: int | None
+
+
 def build_storage(settings: Settings | None = None) -> PostStorage:
     active_settings = settings or get_settings()
     return PostStorage(active_settings.database_path)
@@ -93,7 +100,12 @@ def generate_posts(
                 tone_warmth=post.tone_warmth or "sobrio",
                 promotional_intensity=post.promotional_intensity or "discreto",
             )
-            storage.set_image_path(post_id, str(rendered.file_path))
+            storage.add_image_assets(
+                post_id,
+                [str(rendered.file_path)],
+                source="generation",
+                select_first=True,
+            )
         record = storage.get_post(post_id)
         if record is None:
             raise StorageError(f"Post {post_id} non trovato dopo la creazione.")
@@ -152,7 +164,75 @@ def render_post_image(post_id: int, settings: Settings | None = None) -> PostRec
         tone_warmth=post.tone_warmth or "sobrio",
         promotional_intensity=post.promotional_intensity or "discreto",
     )
-    storage.set_image_path(post.id, str(rendered.file_path))
+    storage.add_image_assets(post.id, [str(rendered.file_path)], source="generation", select_first=True)
+    return _require_post(storage, post_id)
+
+
+def render_post_variants(
+    post_id: int,
+    *,
+    count: int = 3,
+    settings: Settings | None = None,
+) -> RenderVariantsResult:
+    active_settings = settings or get_settings()
+    storage = build_storage(active_settings)
+    post = _require_post(storage, post_id)
+    renderer = _build_image_renderer(active_settings)
+    rendered = renderer.render_post_variants(
+        post_id=post.id,
+        platform=post.platform,
+        title=post.title_internal,
+        prompt=post.image_prompt,
+        count=count,
+        aspect_ratio=post.platform_aspect_ratio,
+        seriousness_level=post.seriousness_level or "equilibrato",
+        tone_warmth=post.tone_warmth or "sobrio",
+        promotional_intensity=post.promotional_intensity or "discreto",
+    )
+    should_select_first = not post.image_path
+    assets = storage.add_image_assets(
+        post.id,
+        [str(item.file_path) for item in rendered],
+        source="variant",
+        select_first=should_select_first,
+    )
+    selected_asset = next((asset for asset in assets if asset.is_selected), None)
+    return RenderVariantsResult(post.id, len(assets), selected_asset.id if selected_asset else None)
+
+
+def select_post_image_asset(post_id: int, asset_id: int, settings: Settings | None = None) -> PostRecord:
+    storage = build_storage(settings)
+    storage.select_image_asset(post_id, asset_id)
+    return _require_post(storage, post_id)
+
+
+def refine_post_image(
+    post_id: int,
+    instruction: str,
+    settings: Settings | None = None,
+) -> PostRecord:
+    active_settings = settings or get_settings()
+    storage = build_storage(active_settings)
+    post = _require_post(storage, post_id)
+    if not post.image_path:
+        raise StorageError("Genera o seleziona prima un'immagine da rifinire.")
+
+    renderer = _build_image_renderer(active_settings)
+    reference_paths = _list_brand_references(active_settings.brand_references_dir)
+    rendered = renderer.refine_post_image(
+        post_id=post.id,
+        platform=post.platform,
+        source_image=Path(post.image_path),
+        instruction=instruction,
+        reference_images=reference_paths,
+    )
+    storage.add_image_assets(
+        post.id,
+        [str(rendered.file_path)],
+        source="refinement",
+        instruction=instruction.strip(),
+        select_first=True,
+    )
     return _require_post(storage, post_id)
 
 
@@ -166,13 +246,7 @@ def render_batch_images(
 ) -> RenderBatchResult:
     active_settings = settings or get_settings()
     storage = build_storage(active_settings)
-    renderer = OpenAIImageRenderer(
-        api_key=active_settings.openai_api_key,
-        output_dir=active_settings.generated_images_dir,
-        model=active_settings.openai_image_model,
-        quality=active_settings.openai_image_quality,
-        output_format=active_settings.openai_image_format,
-    )
+    renderer = _build_image_renderer(active_settings)
 
     posts = storage.list_posts(status=status, limit=limit)
     if platform:
@@ -196,7 +270,7 @@ def render_batch_images(
                 tone_warmth=post.tone_warmth or "sobrio",
                 promotional_intensity=post.promotional_intensity or "discreto",
             )
-            storage.set_image_path(post.id, str(rendered.file_path))
+            storage.add_image_assets(post.id, [str(rendered.file_path)], source="generation", select_first=True)
             generated_count += 1
             items.append(RenderBatchItemResult(post.id, post.platform, True, str(rendered.file_path)))
         except Exception as exc:
@@ -218,7 +292,8 @@ def delete_post(post_id: int, settings: Settings | None = None) -> None:
     storage = build_storage(active_settings)
     post = _require_post(storage, post_id)
 
-    _delete_image_if_present(post.image_path)
+    for asset in storage.list_image_assets(post.id):
+        _delete_image_if_present(asset.file_path)
     delete_export_pack(post, active_settings.exports_dir)
     storage.delete_post(post.id)
 
@@ -236,3 +311,20 @@ def _delete_image_if_present(image_path: str | None) -> None:
     path = Path(image_path)
     if path.exists():
         path.unlink()
+
+
+def _build_image_renderer(settings: Settings) -> OpenAIImageRenderer:
+    return OpenAIImageRenderer(
+        api_key=settings.openai_api_key,
+        output_dir=settings.generated_images_dir,
+        model=settings.openai_image_model,
+        quality=settings.openai_image_quality,
+        output_format=settings.openai_image_format,
+    )
+
+
+def _list_brand_references(reference_dir: Path) -> list[Path]:
+    if not reference_dir.is_dir():
+        return []
+    supported = {".png", ".jpg", ".jpeg", ".webp"}
+    return sorted(path for path in reference_dir.iterdir() if path.is_file() and path.suffix.lower() in supported)

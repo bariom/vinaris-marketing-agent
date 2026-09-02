@@ -37,6 +37,7 @@ data/
 deploy/
 exports/
 generated_images/
+brand_references/
 ```
 
 ## Requisiti
@@ -78,6 +79,7 @@ Variabili supportate:
 - `OPENAI_IMAGE_FORMAT`: formato immagini, default `png`
 - `VINARIS_DB_PATH`: path del database SQLite, default `data/posts.sqlite`
 - `VINARIS_GENERATED_IMAGES_DIR`: cartella output immagini, default `generated_images`
+- `VINARIS_BRAND_REFERENCES_DIR`: cartella delle immagini guida per le rifiniture, default `brand_references`
 - `VINARIS_EXPORTS_DIR`: cartella export manuali, default `exports`
 - `VINARIS_WEB_SECRET`: secret key Flask per la dashboard
 - `VINARIS_APP_ENV`: ambiente applicativo
@@ -155,6 +157,20 @@ Generare o rigenerare l'immagine di un post:
 
 ```bash
 python -m app.main render-image --id 1
+```
+
+Generare tre varianti e scegliere l'asset destinato all'export:
+
+```bash
+python -m app.main render-variants --id 1 --count 3
+python -m app.main show --id 1
+python -m app.main select-image --id 1 --asset-id 12
+```
+
+Rifinire l'immagine selezionata. Le immagini PNG/JPEG/WebP in `brand_references/` vengono inviate come riferimenti di stile:
+
+```bash
+python -m app.main refine-image --id 1 --instruction "Rendi la luce piu calda e lascia spazio negativo a sinistra."
 ```
 
 Esportare un pack manuale per pubblicazione esterna:
@@ -290,6 +306,7 @@ deploy/nginx.vinaris-marketing-agent.conf.example
 - Architettura pronta per future integrazioni API social
 - Integrazione testi via Responses API con Structured Outputs e reasoning configurabile
 - Integrazione immagini via OpenAI Image API
+- GPT Image 2: gallery di varianti, selezione asset e editing con brand references locali
 
 ### Configurazione GPT-5.6
 

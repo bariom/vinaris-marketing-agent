@@ -26,6 +26,9 @@ from app.workflows import (
     reject_post,
     render_batch_images,
     render_post_image,
+    render_post_variants,
+    refine_post_image,
+    select_post_image_asset,
 )
 
 
@@ -91,6 +94,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     render_parser = subparsers.add_parser("render-image", help="Genera un'immagine locale per un post.")
     render_parser.add_argument("--id", type=int, required=True, help="ID del post.")
+
+    variants_parser = subparsers.add_parser("render-variants", help="Genera varianti immagine da selezionare.")
+    variants_parser.add_argument("--id", type=int, required=True, help="ID del post.")
+    variants_parser.add_argument("--count", type=int, choices=range(1, 5), default=3, help="Numero varianti (1-4).")
+
+    select_image_parser = subparsers.add_parser("select-image", help="Seleziona un asset immagine per export.")
+    select_image_parser.add_argument("--id", type=int, required=True, help="ID del post.")
+    select_image_parser.add_argument("--asset-id", type=int, required=True, help="ID dell'asset da selezionare.")
+
+    refine_parser = subparsers.add_parser("refine-image", help="Rifinisce l'immagine selezionata con GPT Image 2.")
+    refine_parser.add_argument("--id", type=int, required=True, help="ID del post.")
+    refine_parser.add_argument("--instruction", required=True, help="Modifica da applicare all'immagine selezionata.")
 
     export_parser = subparsers.add_parser("export", help="Esporta un pack manuale per un post.")
     export_parser.add_argument("--id", type=int, required=True, help="ID del post.")
@@ -229,6 +244,10 @@ def handle_show(post_id: int) -> int:
 
     for key, value in details:
         print(f"{key}: {value}")
+    assets = storage.list_image_assets(post.id)
+    for asset in assets:
+        marker = "*" if asset.is_selected else "-"
+        print(f"image_asset: {marker} id={asset.id} source={asset.source} path={asset.file_path}")
     return 0
 
 
@@ -253,6 +272,25 @@ def handle_publish(post_id: int) -> int:
 def handle_render_image(post_id: int) -> int:
     post = render_post_image(post_id)
     print(f"Immagine generata: {post.image_path}.")
+    return 0
+
+
+def handle_render_variants(post_id: int, count: int) -> int:
+    result = render_post_variants(post_id, count=count)
+    print(f"Generate {result.generated_count} varianti per il post {result.post_id}.")
+    print("Usa 'show' per vedere gli asset e 'select-image' per scegliere quello dell'export.")
+    return 0
+
+
+def handle_select_image(post_id: int, asset_id: int) -> int:
+    post = select_post_image_asset(post_id, asset_id)
+    print(f"Asset {asset_id} selezionato per il post {post.id}: {post.image_path}")
+    return 0
+
+
+def handle_refine_image(post_id: int, instruction: str) -> int:
+    post = refine_post_image(post_id, instruction)
+    print(f"Immagine rifinita e selezionata: {post.image_path}")
     return 0
 
 
@@ -324,6 +362,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             return handle_show(args.id)
         if args.command == "render-image":
             return handle_render_image(args.id)
+        if args.command == "render-variants":
+            return handle_render_variants(args.id, args.count)
+        if args.command == "select-image":
+            return handle_select_image(args.id, args.asset_id)
+        if args.command == "refine-image":
+            return handle_refine_image(args.id, args.instruction)
         if args.command == "export":
             return handle_export(args.id)
         if args.command == "delete":

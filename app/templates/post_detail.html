@@ -79,6 +79,11 @@
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="ghost">Genera immagine</button>
         </form>
+        <form method="post" action="{{ url_for('render_variants', post_id=post.id) }}" data-loading-message="La AI sta generando varianti creative. Attendi il completamento.">
+          <input type="hidden" name="source" value="detail">
+          <input type="hidden" name="count" value="3">
+          <button type="submit" class="ghost">Genera 3 varianti</button>
+        </form>
         <form method="post" action="{{ url_for('export', post_id=post.id) }}">
           <input type="hidden" name="source" value="detail">
           <button type="submit" class="ghost">Export pack</button>
@@ -104,6 +109,53 @@
         <div class="image-placeholder">
           <p>Nessuna immagine generata.</p>
         </div>
+      {% endif %}
+
+      {% if image_assets %}
+        <section class="asset-gallery-section">
+          <div class="section-head compact">
+            <div>
+              <p class="eyebrow">Varianti</p>
+              <h2>Seleziona l'asset</h2>
+            </div>
+          </div>
+          <div class="asset-gallery">
+            {% for asset in image_assets %}
+              <article class="asset-card {{ 'is-selected' if asset.is_selected else '' }}">
+                <img src="{{ url_for('serve_image_asset', post_id=post.id, asset_id=asset.id) }}" alt="Variante {{ asset.id }} del post {{ post.id }}">
+                <div class="asset-card-copy">
+                  <span>{{ asset.source }}</span>
+                  {% if asset.is_selected %}
+                    <strong>Selezionata</strong>
+                  {% else %}
+                    <form method="post" action="{{ url_for('select_image_asset', post_id=post.id, asset_id=asset.id) }}">
+                      <input type="hidden" name="source" value="detail">
+                      <button type="submit" class="ghost">Usa questa</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      {% if image_url %}
+        <section class="refine-panel">
+          <div>
+            <p class="eyebrow">Rifinitura GPT Image 2</p>
+            <h2>Modifica l'immagine selezionata</h2>
+            <p>Le {{ brand_reference_count }} immagini in <code>brand_references/</code> vengono usate come riferimenti di stile.</p>
+          </div>
+          <form method="post" action="{{ url_for('refine_image', post_id=post.id) }}" class="stack" data-loading-message="La AI sta rifinendo l'immagine. Attendi il completamento.">
+            <input type="hidden" name="source" value="detail">
+            <label>
+              <span>Istruzione di modifica</span>
+              <textarea name="instruction" required rows="3" placeholder="Es. rendi la luce piu calda, lascia piu spazio negativo a sinistra e mantieni l'atmosfera editoriale."></textarea>
+            </label>
+            <button type="submit" class="secondary">Rifinisci e seleziona</button>
+          </form>
+        </section>
       {% endif %}
     </aside>
   </section>
